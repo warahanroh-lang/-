@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asking for and Making Suggestions — طلب الاقتراحات وتقديمها</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --paper:#E1F2DC; --ink:#1D1B4A; --band:#C9E6C4; --basil:#1F5A3F; --tomato:#C93A28; --line:#B7D8B1; --navy:#1D1B4A;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px);-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.5 "Poppins",system-ui,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:0 14px}
+
+body[data-mode="en"] .ar{display:none !important}
+body[data-mode="ar"] .en{display:none !important}
+.ar{font-family:"IBM Plex Sans Arabic","Noto Naskh Arabic","Geeza Pro","Segoe UI",Tahoma,sans-serif}
+button:focus-visible{outline:3px solid var(--tomato);outline-offset:2px}
+
+/* toolbar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+.seg{display:flex;gap:4px;padding:8px 0}
+.seg button{flex:1;font:600 14px/1.2 "Poppins",system-ui,sans-serif;padding:10px 8px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;min-height:44px}
+.seg button[aria-pressed="true"]{background:var(--basil);border-color:var(--basil);color:#fff}
+.hint{margin:14px 0 2px;text-align:center;font-size:15px;color:#33604A;display:flex;flex-wrap:wrap;justify-content:center;gap:0 12px}
+.hint svg{width:18px;height:18px;fill:var(--basil);vertical-align:-3px;margin-inline-end:4px}
+
+/* tappable base */
+.tap{all:unset;box-sizing:border-box;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tap:focus-visible{outline:3px solid var(--tomato);outline-offset:2px}
+.tap.line{display:block;width:calc(100% + 12px);margin:0 -6px;padding:2px 6px;border-radius:10px;transition:background .2s,box-shadow .2s}
+.tap.line.ar{direction:rtl;text-align:right}
+.speaking{background:rgba(255,203,61,.75) !important;box-shadow:0 0 0 4px rgba(255,203,61,.75)}
+
+/* title block */
+.hero{margin:18px 0 6px;text-align:center}
+.pills{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:12px}
+.pill{border-radius:14px;padding:8px 16px;font:700 18px/1.2 "Poppins",system-ui,sans-serif;border:2px solid rgba(29,27,74,.25)}
+.pill.unit{background:#FFC36B}
+.pill.lesson{background:#E4D7FF}
+.cloud{background:#fff;border:4px solid #7CC4E8;border-radius:44px;padding:22px 16px 20px;position:relative}
+.cloud .bulb{position:absolute;top:-16px;right:18px;font-size:34px}
+.cloud h1{margin:0;font:700 clamp(26px,7vw,42px)/1.2 "Poppins",system-ui,sans-serif}
+.cloud h1 .tap.line{width:100%;margin:0;text-align:center}
+.cloud h2{margin:6px 0 0;font:700 clamp(24px,6.4vw,34px)/1.5 "IBM Plex Sans Arabic","Noto Naskh Arabic",sans-serif;color:#1D4ED8}
+.cloud h2 .tap.line{width:100%;margin:0;text-align:center}
+
+/* sections */
+.grid2{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+@media (min-width:760px){.grid2{grid-template-columns:1fr 1fr}}
+.box{border-radius:26px;padding:16px 16px 18px;border:3px solid var(--bc);background:var(--bg)}
+.box.idea{--bc:#F2B233;--bg:#FFF1C9}
+.box.usage{--bc:#E58BBF;--bg:#FCE4F1}
+.box.forms{--bc:#7CC4E8;--bg:#DDF0FF;margin-top:14px}
+.box.note{--bc:#E5484D;--bg:#FFF0EE;border-style:dashed;margin-top:14px}
+.bh{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.bh .ico{width:46px;height:46px;border-radius:14px;background:#fff;display:grid;place-items:center;font-size:26px;flex:none}
+.bh h3{margin:0;font:700 20px/1.3 "Poppins",system-ui,sans-serif}
+.bh h3.ar{font-family:"IBM Plex Sans Arabic","Noto Naskh Arabic",sans-serif;font-size:22px;line-height:1.5}
+.note .bh h3{color:#C62828}
+.en-txt{font:500 17px/1.6 "Poppins",system-ui,sans-serif}
+.ar-txt{font-family:"IBM Plex Sans Arabic","Noto Naskh Arabic",sans-serif;font-size:17px;line-height:1.9;color:#3B3A6E}
+.ask{margin:2px 0 8px;font:600 16px/1.4 "Poppins",system-ui,sans-serif}
+.ask.ar{font-family:"IBM Plex Sans Arabic",sans-serif;text-align:right;direction:rtl}
+.bul{margin:0 0 12px}
+.bul .en-txt{font-weight:600}
+
+/* forms */
+.form{border-radius:20px;padding:12px 12px 12px;margin-top:10px;background:var(--fb);border:2px solid var(--fc)}
+.form.f1{--fb:#DCEBFF;--fc:#7AA7F5;--fn:#2563EB}
+.form.f2{--fb:#EBDDFF;--fc:#BE93F0;--fn:#9333EA}
+.form.f3{--fb:#D9F5D5;--fc:#7FCB7A;--fn:#16A34A}
+.formrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.num{width:42px;height:42px;border-radius:50%;background:var(--fn);color:#fff;display:grid;place-items:center;font:700 20px "Poppins",sans-serif;flex:none}
+.plus{font:600 20px "Poppins",sans-serif;color:var(--navy)}
+.tok{background:#fff;border:2px solid var(--fc);color:var(--navy);font:700 19px/1.2 "Poppins",system-ui,sans-serif;padding:9px 16px;border-radius:14px;min-height:44px;display:inline-flex;align-items:center}
+.chip{background:rgba(255,255,255,.55);border:2px dashed var(--fc);color:var(--navy);font:600 15px/1.3 "Poppins",system-ui,sans-serif;padding:6px 12px;border-radius:14px;text-align:center}
+.chip .ar{display:block;font-size:14px;line-height:1.5}
+.punct{font:700 30px/1 "Poppins",sans-serif;color:var(--fn);padding:0 4px}
+.dot{width:22px;height:22px;border-radius:50%;background:var(--fn);display:inline-block;margin:0 4px}
+.useline{margin-top:10px;background:rgba(255,255,255,.6);border-radius:12px;padding:8px 10px}
+.useline .tap.line{font:500 15px/1.5 "Poppins",system-ui,sans-serif}
+.useline .tap.line.ar{font:400 15.5px/1.8 "IBM Plex Sans Arabic",sans-serif;color:#3B3A6E;margin-top:2px}
+
+.play{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px 10px;width:100%;max-width:440px;margin:14px auto 0;padding:11px 20px;border:0;border-radius:999px;background:var(--basil);color:#fff;font:600 15px/1.3 "Poppins",system-ui,sans-serif;cursor:pointer;min-height:46px}
+.play[aria-pressed="true"]{background:var(--tomato)}
+.play svg{width:20px;height:20px;fill:currentColor;flex:none}
+.play .ar{font-size:16px}
+
+.note .tap.line.en{font:500 18px/1.65 "Poppins",system-ui,sans-serif}
+.note .tap.line.ar{font:400 19px/1.95 "IBM Plex Sans Arabic",sans-serif}
+.note b{color:#C62828}
+
+.foot{margin-top:28px;background:var(--band);text-align:center;padding:20px 18px 26px}
+.quote{font:500 italic 15px/1.4 "Poppins",sans-serif;color:#33604A;margin-bottom:6px}
+.name{font:700 italic clamp(30px,8vw,46px)/1.15 "Poppins",Georgia,serif;color:#173F2E}
+#toast{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9;max-width:520px;margin:0 auto;background:#173F2E;color:#fff;padding:12px 16px;border-radius:12px;font:500 14px/1.6 "IBM Plex Sans Arabic",system-ui,sans-serif;display:none}
+#toast.show{display:block}
+@media (prefers-reduced-motion:reduce){.tap.line{transition:none}}
+</style>
+</head>
+<body data-mode="both">
+
+<div class="bar">
+  <div class="wrap">
+    <div class="seg" role="group" aria-label="Language / اللغة">
+      <button type="button" data-mode="both" aria-pressed="true">عربي + English</button>
+      <button type="button" data-mode="en" aria-pressed="false">English</button>
+      <button type="button" data-mode="ar" aria-pressed="false">عربي</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <p class="hint">
+    <span class="en"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l5 4V6L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>Tap any English phrase or sentence to hear it</span>
+    <span class="ar" lang="ar" dir="rtl">اضغط على أي عبارة أو جملة لتسمعها</span>
+  </p>
+
+  <header class="hero">
+    <div class="pills">
+      <span class="pill unit">Unit 1</span>
+      <span class="pill lesson">Lesson 2: A New Project</span>
+    </div>
+    <div class="cloud">
+      <span class="bulb" aria-hidden="true">💡</span>
+      <h1 class="en"><button type="button" class="tap line rd" data-lang="en">Asking for and Making Suggestions</button></h1>
+      <h2 class="ar" lang="ar" dir="rtl"><button type="button" class="tap line rd" data-lang="ar" lang="ar">طلب الاقتراحات وتقديمها</button></h2>
+    </div>
+    <button type="button" class="play" id="play" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span class="en">Listen to the lesson</span><span class="ar" lang="ar" dir="rtl">استمع إلى الدرس</span></button>
+  </header>
+
+  <div class="grid2">
+    <section class="box idea" aria-labelledby="h-idea">
+      <div class="bh"><div class="ico" aria-hidden="true">🎯</div>
+        <div><h3 class="en" id="h-idea">The Basic Idea</h3><h3 class="ar" lang="ar" dir="rtl">الفكرة الأساسية</h3></div></div>
+      <button type="button" class="tap line en en-txt rd" data-lang="en">We use suggestions when we want to suggest an idea or activity to someone or a group, or ask for their opinion about an idea.</button>
+      <button type="button" class="tap line ar ar-txt rd" data-lang="ar" lang="ar">نستخدم الاقتراحات عندما نريد أن نقترح فكرة أو نشاطًا على شخص أو مجموعة، أو أن نطلب رأيهم في فكرة.</button>
+    </section>
+
+    <section class="box usage" aria-labelledby="h-use">
+      <div class="bh"><div class="ico" aria-hidden="true">⚙️</div>
+        <div><h3 class="en" id="h-use">Usage</h3><h3 class="ar" lang="ar" dir="rtl">الاستخدام</h3></div></div>
+      <p class="ask en">When do we use it?</p>
+      <p class="ask ar" lang="ar" dir="rtl">متى نستخدمها؟</p>
+      <div class="bul">
+        <button type="button" class="tap line en en-txt rd" data-lang="en">To suggest an idea or activity.</button>
+        <button type="button" class="tap line ar ar-txt rd" data-lang="ar" lang="ar">لاقتراح فكرة أو نشاط.</button>
+      </div>
+      <div class="bul">
+        <button type="button" class="tap line en en-txt rd" data-lang="en">To ask for someone’s opinion.</button>
+        <button type="button" class="tap line ar ar-txt rd" data-lang="ar" lang="ar">لطلب رأي شخص أو مجموعة.</button>
+      </div>
+      <div class="bul">
+        <button type="button" class="tap line en en-txt rd" data-lang="en">To make a suggestion.</button>
+        <button type="button" class="tap line ar ar-txt rd" data-lang="ar" lang="ar">لتقديم اقتراح مباشر.</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="box forms" aria-labelledby="h-forms">
+    <div class="bh"><div class="ico" aria-hidden="true">📝</div>
+      <div><h3 class="en" id="h-forms">The Forms</h3><h3 class="ar" lang="ar" dir="rtl">القاعدة</h3></div></div>
+
+    <div class="form f1">
+      <div class="formrow">
+        <span class="num">1</span>
+        <button type="button" class="tap tok" data-lang="en">Why don’t we</button>
+        <span class="plus">+</span>
+        <span class="chip">base form<span class="ar" lang="ar">(فعل مجرد)</span></span>
+        <span class="plus">+</span>
+        <span class="chip">the rest of the sentence<span class="ar" lang="ar">سائر الجملة</span></span>
+        <span class="punct">?</span>
+      </div>
+      <div class="useline">
+        <button type="button" class="tap line en rd" data-lang="en" data-say="To suggest an idea or activity. To ask for someone’s opinion.">Use: to suggest an idea or activity / to ask for someone’s opinion.</button>
+        <button type="button" class="tap line ar rd" data-lang="ar" lang="ar" data-say="لاقتراح فكرة أو نشاط، أو لطلب رأي شخص أو مجموعة.">الاستخدام: لاقتراح فكرة أو نشاط / لطلب رأي شخص أو مجموعة.</button>
+      </div>
+    </div>
+
+    <div class="form f2">
+      <div class="formrow">
+        <span class="num">2</span>
+        <button type="button" class="tap tok" data-lang="en">Shall we</button>
+        <span class="plus">+</span>
+        <span class="chip">base form<span class="ar" lang="ar">(فعل مجرد)</span></span>
+        <span class="plus">+</span>
+        <span class="chip">the rest of the sentence<span class="ar" lang="ar">سائر الجملة</span></span>
+        <span class="punct">?</span>
+      </div>
+      <div class="useline">
+        <button type="button" class="tap line en rd" data-lang="en" data-say="To ask for someone’s opinion. To make a suggestion.">Use: to ask for someone’s opinion / to make a suggestion.</button>
+        <button type="button" class="tap line ar rd" data-lang="ar" lang="ar" data-say="لطلب رأي شخص أو مجموعة، أو لتقديم اقتراح مباشر.">الاستخدام: لطلب رأي شخص أو مجموعة / لتقديم اقتراح مباشر.</button>
+      </div>
+    </div>
+
+    <div class="form f3">
+      <div class="formrow">
+        <span class="num">3</span>
+        <button type="button" class="tap tok" data-lang="en">Let’s</button>
+        <span class="plus">+</span>
+        <span class="chip">base form<span class="ar" lang="ar">(فعل مجرد)</span></span>
+        <span class="plus">+</span>
+        <span class="chip">the rest of the sentence<span class="ar" lang="ar">سائر الجملة</span></span>
+        <span class="dot" aria-label="full stop"></span>
+      </div>
+      <div class="useline">
+        <button type="button" class="tap line en rd" data-lang="en" data-say="To make a suggestion.">Use: to make a suggestion.</button>
+        <button type="button" class="tap line ar rd" data-lang="ar" lang="ar" data-say="لتقديم اقتراح مباشر.">الاستخدام: لتقديم اقتراح مباشر.</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="box note" aria-labelledby="h-note">
+    <div class="bh"><div class="ico" aria-hidden="true">⚠️</div>
+      <div><h3 class="en" id="h-note">Important note</h3><h3 class="ar" lang="ar" dir="rtl">تنبيه مهم</h3></div></div>
+    <button type="button" class="tap line en rd" data-lang="en">When using “Why don’t we?” and “Shall we?”, we must put a question mark (?) at the end of the sentence, because they are used to ask a question.</button>
+    <button type="button" class="tap line ar rd" data-lang="ar" lang="ar">عند استخدام (?Why don’t we) و (?Shall we) يجب أن نضع علامة الاستفهام (؟) في نهاية الجملة لأنهما يستخدمان لطرح سؤال.</button>
+  </section>
+
+</main>
+
+<footer class="foot"><div class="quote">Small steps, big dreams</div><div class="name">Dhuha Karim</div></footer>
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+  var body=document.body, synth=window.speechSynthesis, voices=[];
+  var PLAY='<path d="M8 5v14l11-7z"/>', STOP='<path d="M6 6h12v12H6z"/>';
+
+  var segs=document.querySelectorAll('.seg button');
+  function setMode(m){
+    body.setAttribute('data-mode',m);
+    segs.forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m?'true':'false')});
+    try{localStorage.setItem('suggestions-mode',m)}catch(e){}
+  }
+  segs.forEach(function(b){b.addEventListener('click',function(){stopAll();setMode(b.getAttribute('data-mode'))})});
+  try{var saved=localStorage.getItem('suggestions-mode'); if(saved) setMode(saved);}catch(e){}
+
+  var playBtn=document.getElementById('play');
+  var toastEl=document.getElementById('toast'), toastT;
+  function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show')},5000)}
+
+  if(!synth){playBtn.style.display='none';document.querySelector('.hint').style.display='none';return}
+
+  function loadVoices(){voices=synth.getVoices()||[]}
+  loadVoices(); synth.onvoiceschanged=loadVoices;
+  function pick(lang){
+    var prefs=lang==='ar'?['ar']:['en-gb','en-us','en'];
+    for(var i=0;i<prefs.length;i++){
+      for(var j=0;j<voices.length;j++){
+        if(voices[j].lang.replace('_','-').toLowerCase().indexOf(prefs[i])===0) return voices[j];
+      }
+    }
+    return null;
+  }
+
+  var session=0, playing=false;
+  function clearUI(){document.querySelectorAll('.speaking').forEach(function(e){e.classList.remove('speaking')})}
+  function setPlay(on){
+    playBtn.setAttribute('aria-pressed',on?'true':'false');
+    playBtn.querySelector('svg').innerHTML=on?STOP:PLAY;
+    playBtn.querySelector('.en').textContent=on?'Stop':'Listen to the lesson';
+    playBtn.querySelector('.ar').textContent=on?'إيقاف':'استمع إلى الدرس';
+  }
+  function stopAll(){session++;playing=false;synth.cancel();clearUI();setPlay(false)}
+
+  function textOf(el){return (el.getAttribute('data-say')||el.textContent).replace(/\s+/g,' ').trim()}
+
+  function say(text,lang,el,done){
+    var my=++session;
+    synth.cancel(); clearUI();
+    if(lang==='ar' && voices.length && !pick('ar')){
+      toast('لا يوجد صوت عربي على جهازك. يمكنك تثبيته من إعدادات الجهاز (تحويل النص إلى كلام).');
+    }
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang=lang==='ar'?'ar-SA':'en-GB';
+    var v=pick(lang); if(v) u.voice=v;
+    u.rate=lang==='ar'?0.9:0.85;
+    if(el) el.classList.add('speaking');
+    function end(){
+      if(my!==session) return;
+      if(el) el.classList.remove('speaking');
+      if(done) done();
+    }
+    u.onend=end; u.onerror=end;
+    synth.speak(u);
+  }
+
+  document.addEventListener('click',function(e){
+    var el=e.target.closest('.tap'); if(!el) return;
+    var was=el.classList.contains('speaking');
+    if(playing) stopAll();
+    if(was){stopAll();return}
+    say(textOf(el),el.getAttribute('data-lang')||'en',el);
+  });
+
+  playBtn.addEventListener('click',function(){
+    if(playing){stopAll();return}
+    var lang=body.getAttribute('data-mode')==='ar'?'ar':'en';
+    var lines=Array.prototype.filter.call(document.querySelectorAll('.rd[data-lang="'+lang+'"]'),function(l){return l.offsetParent!==null});
+    var i=0; playing=true; setPlay(true);
+    (function next(){
+      if(!playing||i>=lines.length){playing=false;setPlay(false);return}
+      var l=lines[i++];
+      l.scrollIntoView({block:'center',behavior:'smooth'});
+      say(textOf(l),lang,l,next);
+    })();
+  });
+})();
+</script>
+</body>
+</html>
