@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The four patterns — القوالب الأربعة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --paper:#E1F2DC; --ink:#1D1B4A; --band:#C9E6C4; --basil:#1F5A3F; --tomato:#C93A28; --line:#B7D8B1;
+  --navy:#1D1B4A; --yellow:#FFCB3D; --yellow-line:#D19A00;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px);-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.5 "Poppins",system-ui,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:0 14px}
+
+body[data-mode="en"] .ar{display:none !important}
+body[data-mode="ar"] .en{display:none !important}
+.ar{font-family:"IBM Plex Sans Arabic","Noto Naskh Arabic","Geeza Pro","Segoe UI",Tahoma,sans-serif}
+button:focus-visible{outline:3px solid var(--tomato);outline-offset:2px}
+
+/* toolbar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+.seg{display:flex;gap:4px;padding:8px 0}
+.seg button{flex:1;font:600 14px/1.2 "Poppins",system-ui,sans-serif;padding:10px 8px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;min-height:44px}
+.seg button[aria-pressed="true"]{background:var(--basil);border-color:var(--basil);color:#fff}
+.hint{margin:14px 0 2px;text-align:center;font-size:15px;color:#33604A;display:flex;flex-wrap:wrap;justify-content:center;gap:0 12px}
+.hint svg{width:18px;height:18px;fill:var(--basil);vertical-align:-3px;margin-inline-end:4px}
+
+/* panels */
+.panel{margin:18px 0;border-radius:28px;padding:20px 14px 22px}
+.panel.white{background:#fff}
+.panel.lav{background:#E5DDFF}
+.head{display:flex;align-items:center;gap:14px;margin:0 4px 14px}
+.head .ico{width:54px;height:54px;border-radius:16px;background:#FFF1BF;display:grid;place-items:center;font-size:30px;flex:none}
+.lav .head .ico{background:#fff}
+.head .txt{min-width:0}
+.head h2{margin:0;font:700 22px/1.3 "Poppins",system-ui,sans-serif}
+.head h2.ar{font-family:"IBM Plex Sans Arabic","Noto Naskh Arabic",sans-serif;font-size:25px;line-height:1.5}
+.head p{margin:2px 0 0;font-size:14px;opacity:.75}
+.head p.ar{font-size:15px;line-height:1.6}
+.play{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px 10px;width:100%;max-width:440px;margin:6px 4px 14px;padding:11px 20px;border:0;border-radius:999px;background:var(--basil);color:#fff;font:600 15px/1.3 "Poppins",system-ui,sans-serif;cursor:pointer;min-height:46px}
+.play[aria-pressed="true"]{background:var(--tomato)}
+.play svg{width:20px;height:20px;fill:currentColor;flex:none}
+.play .ar{font-size:16px}
+
+/* cards */
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:720px){.grid{grid-template-columns:1fr 1fr;gap:14px}}
+.card{border-radius:24px;padding:16px 16px 14px}
+.card.ask{background:#E5DDFF;--c:#5B2EC9}
+.card.suggest{background:#FFE2D9;--c:#B8420E}
+.card.agree{background:#DCE6FF;--c:#1D4ED8}
+.card.decide{background:#D3F3E4;--c:#0B7A54}
+.card h3{margin:0;font:700 18px/1.35 "Poppins",system-ui,sans-serif;color:var(--c)}
+.card h3.ar{font-family:"IBM Plex Sans Arabic","Noto Naskh Arabic",sans-serif;font-size:20px;line-height:1.6;text-align:right;direction:rtl}
+.pattern{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}
+.tok{all:unset;box-sizing:border-box;cursor:pointer;background:var(--navy);color:#fff;font:600 17px/1.2 "Poppins",system-ui,sans-serif;padding:10px 16px;border-radius:14px;min-height:44px;display:inline-flex;align-items:center;-webkit-tap-highlight-color:transparent}
+.slot{background:var(--yellow);border:2px solid var(--yellow-line);color:var(--navy);font:600 17px/1.2 "Poppins",system-ui,sans-serif;padding:8px 14px;border-radius:14px;display:inline-flex;gap:8px;align-items:center}
+.slot .ar{font-size:15px;font-weight:600}
+.punct{font:700 24px/1 "Poppins",sans-serif;padding:0 2px}
+.ex{all:unset;box-sizing:border-box;display:block;width:calc(100% + 12px);cursor:pointer;border-radius:10px;padding:2px 6px;margin:0 -6px;transition:background .2s,box-shadow .2s;-webkit-tap-highlight-color:transparent}
+.ex.en{font:700 20px/1.4 "Poppins",system-ui,sans-serif}
+.ex.ar{font-family:"IBM Plex Sans Arabic","Noto Naskh Arabic",sans-serif;font-weight:400;font-size:17px;line-height:1.7;color:#4B4A7C;text-align:right;direction:rtl;margin-top:2px}
+.tap:focus-visible,.word:focus-visible{outline:3px solid var(--tomato);outline-offset:2px}
+.speaking{background:rgba(255,203,61,.75) !important;box-shadow:0 0 0 4px rgba(255,203,61,.75)}
+.tok.speaking{background:var(--navy) !important;box-shadow:0 0 0 4px var(--yellow)}
+
+/* points */
+.points{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.pt{background:#fff;border-radius:18px;padding:12px 14px 12px 12px;display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;border-inline-start:8px solid var(--pc);box-shadow:0 3px 0 rgba(29,27,74,.12)}
+.pt:nth-child(1){--pc:#C2500E}.pt:nth-child(2){--pc:#0E8F60}.pt:nth-child(3){--pc:#2A55D8}.pt:nth-child(4){--pc:#E0316F}.pt:nth-child(5){--pc:#FFCB3D}
+.num{width:34px;height:34px;border-radius:50%;background:var(--pc);color:#fff;display:grid;place-items:center;font:700 16px "Poppins",sans-serif}
+.pt:nth-child(5) .num{color:var(--navy)}
+.pt p{margin:0;font-size:16.5px;line-height:1.65}
+.pt p.ar{font-size:17.5px;line-height:1.9;direction:rtl;text-align:right;color:#3B3A6E;margin-top:4px}
+.word{all:unset;cursor:pointer;font:600 16px "Poppins",sans-serif;direction:ltr;unicode-bidi:isolate;display:inline-block;color:#0B6B47;border-bottom:2px dotted #0B6B47;padding:0 2px;-webkit-tap-highlight-color:transparent}
+.word.ok::before{content:"✓ ";font-weight:700}
+.wrong{font:600 16px "Poppins",sans-serif;direction:ltr;unicode-bidi:isolate;display:inline-block;color:#B42318;text-decoration:line-through;padding:0 2px}
+.wrong::before{content:"✗ ";text-decoration:none;display:inline-block;font-weight:700}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block;font-weight:700}
+
+.foot{margin-top:28px;background:var(--band);text-align:center;padding:22px 18px 26px}
+.name{font:700 italic clamp(30px,8vw,46px)/1.15 "Poppins",Georgia,serif;color:#173F2E}
+#toast{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9;max-width:520px;margin:0 auto;background:#173F2E;color:#fff;padding:12px 16px;border-radius:12px;font:500 14px/1.6 "IBM Plex Sans Arabic",system-ui,sans-serif;display:none}
+#toast.show{display:block}
+@media (prefers-reduced-motion:reduce){.ex{transition:none}}
+</style>
+</head>
+<body data-mode="both">
+
+<div class="bar">
+  <div class="wrap">
+    <div class="seg" role="group" aria-label="Language / اللغة">
+      <button type="button" data-mode="both" aria-pressed="true">عربي + English</button>
+      <button type="button" data-mode="en" aria-pressed="false">English</button>
+      <button type="button" data-mode="ar" aria-pressed="false">عربي</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <p class="hint">
+    <span class="en"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l5 4V6L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>Tap any English phrase or sentence to hear it</span>
+    <span class="ar" lang="ar" dir="rtl">اضغط على أي عبارة أو جملة لتسمعها</span>
+  </p>
+
+  <section class="panel white" aria-labelledby="h-pat">
+    <div class="head">
+      <div class="ico" aria-hidden="true">🧩</div>
+      <div class="txt">
+        <h2 class="en" id="h-pat">The four patterns</h2>
+        <h2 class="ar" lang="ar" dir="rtl">القوالب الأربعة</h2>
+        <p class="en">The yellow slot is where the base verb goes</p>
+        <p class="ar" lang="ar" dir="rtl">الخانة الصفراء هي مكان الفعل المجرد</p>
+      </div>
+    </div>
+
+    <button type="button" class="play" id="play" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span class="en">Listen to the examples</span><span class="ar" lang="ar" dir="rtl">استمع إلى الأمثلة</span></button>
+
+    <div class="grid">
+      <article class="card ask">
+        <h3 class="en">We ask: What shall we do?</h3>
+        <h3 class="ar" lang="ar" dir="rtl">نسأل: ماذا نفعل؟</h3>
+        <div class="pattern"><button type="button" class="tap tok" data-lang="en">What shall we</button><span class="slot">verb <span class="ar" lang="ar">مجرد</span></span><span class="punct">?</span></div>
+        <button type="button" class="tap ex en" data-lang="en">What shall we eat?</button>
+        <button type="button" class="tap ex ar" data-lang="ar" lang="ar">ماذا نأكل؟</button>
+      </article>
+
+      <article class="card suggest">
+        <h3 class="en">We suggest: Why don't we…?</h3>
+        <h3 class="ar" lang="ar" dir="rtl">نقترح: لماذا لا…؟</h3>
+        <div class="pattern"><button type="button" class="tap tok" data-lang="en">Why don't we</button><span class="slot">verb <span class="ar" lang="ar">مجرد</span></span><span class="punct">?</span></div>
+        <button type="button" class="tap ex en" data-lang="en">Why don't we play football?</button>
+        <button type="button" class="tap ex ar" data-lang="ar" lang="ar">لماذا لا نلعب كرة القدم؟</button>
+      </article>
+
+      <article class="card agree">
+        <h3 class="en">We agree with the suggestion</h3>
+        <h3 class="ar" lang="ar" dir="rtl">نوافق على الاقتراح</h3>
+        <div class="pattern"><button type="button" class="tap tok" data-lang="en">That's</button><button type="button" class="tap tok" data-lang="en">a great idea</button><span class="punct">.</span></div>
+        <button type="button" class="tap ex en" data-lang="en" data-say="Yes, let's! Good idea!">Yes, let's! / Good idea!</button>
+        <button type="button" class="tap ex ar" data-lang="ar" lang="ar">نعم، هيا بنا! / فكرة جيدة!</button>
+      </article>
+
+      <article class="card decide">
+        <h3 class="en">We decide on the suggestion: Let's…</h3>
+        <h3 class="ar" lang="ar" dir="rtl">نحدد الاقتراح: لنَ…</h3>
+        <div class="pattern"><button type="button" class="tap tok" data-lang="en">Let's</button><span class="slot">verb <span class="ar" lang="ar">مجرد</span></span><span class="punct">.</span></div>
+        <button type="button" class="tap ex en" data-lang="en">Let's go to the park.</button>
+        <button type="button" class="tap ex ar" data-lang="ar" lang="ar">لنذهب إلى الحديقة.</button>
+      </article>
+    </div>
+  </section>
+
+  <section class="panel lav" aria-labelledby="h-rem">
+    <div class="head">
+      <div class="ico" aria-hidden="true">⚠️</div>
+      <div class="txt">
+        <h2 class="en" id="h-rem">Remember these points</h2>
+        <h2 class="ar" lang="ar" dir="rtl">تذكّر هذه النقاط</h2>
+        <p class="en">Common mistakes you can avoid</p>
+        <p class="ar" lang="ar" dir="rtl">أخطاء شائعة يمكن تجنبها</p>
+      </div>
+    </div>
+
+    <ol class="points">
+      <li class="pt"><span class="num">1</span><div>
+        <p class="en">After these patterns, use the base form of the verb: <button type="button" class="word ok" data-lang="en">Let's go</button>, not <span class="wrong">Let's to go</span>.</p>
+        <p class="ar" lang="ar" dir="rtl">بعد هذه القوالب: الفعل بصيغته الأولى، <button type="button" class="word ok" data-lang="en">Let's go</button> وليس <span class="wrong">Let's to go</span>.</p>
+      </div></li>
+      <li class="pt"><span class="num">2</span><div>
+        <p class="en"><button type="button" class="word" data-lang="en">Let's</button> is short for <button type="button" class="word" data-lang="en">Let us</button>.</p>
+        <p class="ar" lang="ar" dir="rtl"><button type="button" class="word" data-lang="en">Let's</button> اختصار <button type="button" class="word" data-lang="en">Let us</button> ومعناها «هيا بنا».</p>
+      </div></li>
+      <li class="pt"><span class="num">3</span><div>
+        <p class="en"><button type="button" class="word" data-lang="en">shall</button> is only used with <button type="button" class="word" data-lang="en">we</button> to ask for a suggestion.</p>
+        <p class="ar" lang="ar" dir="rtl"><button type="button" class="word" data-lang="en">shall</button> تُستخدم مع <button type="button" class="word" data-lang="en">we</button> فقط للسؤال عن الاقتراح.</p>
+      </div></li>
+      <li class="pt"><span class="num">4</span><div>
+        <p class="en">Don't forget <span class="ltr">a</span>: <button type="button" class="word ok" data-lang="en">That's a great idea</button>, not <span class="wrong">That's great idea</span>.</p>
+        <p class="ar" lang="ar" dir="rtl">لا تنسَ <span class="ltr">a</span>: <button type="button" class="word ok" data-lang="en">That's a great idea</button> وليس <span class="wrong">That's great idea</span>.</p>
+      </div></li>
+      <li class="pt"><span class="num">5</span><div>
+        <p class="en">Questions end with “?”. <button type="button" class="word" data-lang="en">Let's</button> and <button type="button" class="word" data-lang="en">That's</button> sentences end with a full stop.</p>
+        <p class="ar" lang="ar" dir="rtl">الأسئلة تنتهي بـ «؟»، وأما <button type="button" class="word" data-lang="en">Let's</button> و<button type="button" class="word" data-lang="en">That's</button> فتنتهي بنقطة.</p>
+      </div></li>
+    </ol>
+  </section>
+
+</main>
+
+<footer class="foot"><div class="name">Dhuha Karim</div></footer>
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+  var body=document.body, synth=window.speechSynthesis, voices=[];
+  var PLAY='<path d="M8 5v14l11-7z"/>', STOP='<path d="M6 6h12v12H6z"/>';
+
+  var segs=document.querySelectorAll('.seg button');
+  function setMode(m){
+    body.setAttribute('data-mode',m);
+    segs.forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m?'true':'false')});
+    try{localStorage.setItem('patterns-mode',m)}catch(e){}
+  }
+  segs.forEach(function(b){b.addEventListener('click',function(){stopAll();setMode(b.getAttribute('data-mode'))})});
+  try{var saved=localStorage.getItem('patterns-mode'); if(saved) setMode(saved);}catch(e){}
+
+  var playBtn=document.getElementById('play');
+  var toastEl=document.getElementById('toast'), toastT;
+  function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show')},5000)}
+
+  if(!synth){playBtn.style.display='none';document.querySelector('.hint').style.display='none';return}
+
+  function loadVoices(){voices=synth.getVoices()||[]}
+  loadVoices(); synth.onvoiceschanged=loadVoices;
+  function pick(lang){
+    var prefs=lang==='ar'?['ar']:['en-gb','en-us','en'];
+    for(var i=0;i<prefs.length;i++){
+      for(var j=0;j<voices.length;j++){
+        if(voices[j].lang.replace('_','-').toLowerCase().indexOf(prefs[i])===0) return voices[j];
+      }
+    }
+    return null;
+  }
+
+  var session=0, playing=false;
+  function clearUI(){document.querySelectorAll('.speaking').forEach(function(e){e.classList.remove('speaking')})}
+  function setPlay(on){
+    playBtn.setAttribute('aria-pressed',on?'true':'false');
+    playBtn.querySelector('svg').innerHTML=on?STOP:PLAY;
+    playBtn.querySelector('.en').textContent=on?'Stop':'Listen to the examples';
+    playBtn.querySelector('.ar').textContent=on?'إيقاف':'استمع إلى الأمثلة';
+  }
+  function stopAll(){session++;playing=false;synth.cancel();clearUI();setPlay(false)}
+
+  function say(text,lang,el,done){
+    var my=++session;
+    synth.cancel(); clearUI();
+    if(lang==='ar' && voices.length && !pick('ar')){
+      toast('لا يوجد صوت عربي على جهازك. يمكنك تثبيته من إعدادات الجهاز (تحويل النص إلى كلام).');
+    }
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang=lang==='ar'?'ar-SA':'en-GB';
+    var v=pick(lang); if(v) u.voice=v;
+    u.rate=lang==='ar'?0.9:0.85;
+    if(el) el.classList.add('speaking');
+    function end(){
+      if(my!==session) return;
+      if(el) el.classList.remove('speaking');
+      if(done) done();
+    }
+    u.onend=end; u.onerror=end;
+    synth.speak(u);
+  }
+
+  document.addEventListener('click',function(e){
+    var el=e.target.closest('.tap,.word'); if(!el) return;
+    var text=(el.getAttribute('data-say')||el.textContent).replace(/\s+/g,' ').trim();
+    var was=el.classList.contains('speaking');
+    if(playing) stopAll();
+    if(was){stopAll();return}
+    say(text,el.getAttribute('data-lang')||'en',el);
+  });
+
+  playBtn.addEventListener('click',function(){
+    if(playing){stopAll();return}
+    var lang=body.getAttribute('data-mode')==='ar'?'ar':'en';
+    var lines=Array.prototype.filter.call(document.querySelectorAll('.ex.'+lang),function(l){return l.offsetParent!==null});
+    var i=0; playing=true; setPlay(true);
+    (function next(){
+      if(!playing||i>=lines.length){playing=false;setPlay(false);return}
+      var l=lines[i++];
+      l.scrollIntoView({block:'center',behavior:'smooth'});
+      say((l.getAttribute('data-say')||l.textContent).replace(/\s+/g,' ').trim(),lang,l,next);
+    })();
+  });
+})();
+</script>
+</body>
+</html>
