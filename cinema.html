@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Food and cinema conversations — محادثات ناطقة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --paper:#E1F2DC; --ink:#1B2E22; --band:#C9E6C4; --basil:#1F5A3F; --tomato:#C93A28; --line:#B7D8B1;
+  --navy:#1D1B4A; --navy2:#2E2C6B; --blueB:#DCE6FF; --pinkB:#FFDDE8; --yellow:#FFD75E; --cream:#FFF1BF;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px);-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.5 "Poppins",system-ui,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+
+body[data-mode="en"] .ar{display:none !important}
+body[data-mode="ar"] .en{display:none !important}
+.ar{font-family:"IBM Plex Sans Arabic","Noto Naskh Arabic","Geeza Pro","Segoe UI",Tahoma,sans-serif}
+button:focus-visible{outline:3px solid var(--tomato);outline-offset:2px}
+
+/* toolbar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+.seg{display:flex;gap:4px;padding:8px 0}
+.seg button{flex:1;font:600 14px/1.2 "Poppins",system-ui,sans-serif;padding:10px 8px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;min-height:44px}
+.seg button[aria-pressed="true"]{background:var(--basil);border-color:var(--basil);color:#fff}
+.hint{margin:14px 0 2px;text-align:center;font-size:15px;color:#33604A;display:flex;flex-wrap:wrap;justify-content:center;gap:0 12px}
+.hint svg{width:18px;height:18px;fill:var(--basil);vertical-align:-3px;margin-inline-end:4px}
+
+/* panels */
+.panel{position:relative;margin:18px 0;border-radius:28px;padding:22px 14px 24px}
+.panel.read{background:var(--cream)}
+.panel.solve{background:var(--navy);color:#fff;padding-top:44px;padding-bottom:44px}
+.panel.solve::before,.panel.solve::after{content:"";position:absolute;left:22px;right:22px;height:12px;border-radius:6px;
+  background:repeating-linear-gradient(90deg,#C9C7E6 0 26px,transparent 26px 38px)}
+.panel.solve::before{top:16px}
+.panel.solve::after{bottom:16px}
+.head{display:flex;align-items:center;gap:14px;margin:0 4px 14px}
+.head .ico{width:54px;height:54px;border-radius:16px;background:#fff;display:grid;place-items:center;font-size:30px;flex:none}
+.solve .head .ico{background:var(--yellow)}
+.head h2{margin:0;font:700 21px/1.3 "Poppins",system-ui,sans-serif}
+.head h2.ar{font-family:"IBM Plex Sans Arabic","Noto Naskh Arabic",sans-serif;font-weight:700;font-size:24px;line-height:1.5}
+.head p{margin:2px 0 0;font-size:14px;opacity:.75}
+.head p.ar{font-size:15px;line-height:1.6}
+.head .txt{min-width:0}
+.play{display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px 10px;margin:4px 4px 8px;padding:11px 20px;border:0;border-radius:999px;background:var(--basil);color:#fff;font:600 15px/1.3 "Poppins",system-ui,sans-serif;cursor:pointer;min-height:46px}
+.solve .play{background:var(--yellow);color:var(--navy)}
+.play[aria-pressed="true"]{background:var(--tomato);color:#fff}
+.play svg{width:20px;height:20px;fill:currentColor;flex:none}
+.play .ar{font-size:16px}
+
+/* answer chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 4px 10px}
+.chip{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 8px;border-radius:999px;background:var(--navy2);color:#fff;cursor:pointer;font:600 16px/1.2 "Poppins",system-ui,sans-serif;min-height:44px}
+.chip:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.chip b{width:28px;height:28px;border-radius:50%;background:var(--yellow);color:var(--navy);display:grid;place-items:center;font-size:14px;flex:none}
+.chip.speaking{box-shadow:0 0 0 3px var(--yellow)}
+
+/* chat */
+.msg{display:flex;align-items:flex-end;gap:10px;margin:14px 0}
+.msg.b{flex-direction:row-reverse}
+.avatar{width:44px;height:44px;border-radius:50%;flex:none;display:grid;place-items:center;font:700 18px "Poppins",sans-serif;color:#fff;border:3px solid #fff}
+.a .avatar{background:#3B6BF5}
+.b .avatar{background:#EF4E86}
+.bubble{max-width:calc(100% - 56px);border-radius:20px;padding:12px 16px 12px;box-shadow:0 3px 0 rgba(29,27,74,.18);color:var(--navy)}
+.a .bubble{background:var(--blueB);border-bottom-left-radius:6px}
+.b .bubble{background:var(--pinkB);border-bottom-right-radius:6px}
+.line{all:unset;display:block;cursor:pointer;border-radius:10px;padding:2px 6px;margin:-2px -6px;transition:background .2s,box-shadow .2s;-webkit-tap-highlight-color:transparent}
+.line:focus-visible{outline:3px solid var(--tomato);outline-offset:1px}
+.line.en{font:600 20px/1.4 "Poppins",system-ui,sans-serif}
+.line.ar{font-family:"IBM Plex Sans Arabic","Noto Naskh Arabic","Geeza Pro",sans-serif;font-weight:400;font-size:17px;line-height:1.7;color:#4B4A7C;text-align:right;direction:rtl;margin-top:4px}
+.line.speaking{background:rgba(255,215,94,.6);box-shadow:0 0 0 4px rgba(255,215,94,.6)}
+mark{background:linear-gradient(transparent 52%,var(--yellow) 52%);color:inherit;padding:0 2px}
+
+/* dolma note */
+.note{display:flex;gap:12px;align-items:center;margin:16px 0 0;padding:14px 16px;border-radius:18px;background:#fff;color:var(--navy);direction:rtl;font-size:16px;line-height:1.8}
+.note .em{font-size:38px;flex:none}
+.word{all:unset;cursor:pointer;font:600 16px "Poppins",sans-serif;direction:ltr;display:inline-block;border-bottom:2px dotted var(--tomato)}
+.word.speaking{background:rgba(255,215,94,.6)}
+.word:focus-visible{outline:3px solid var(--tomato)}
+
+.foot{margin-top:28px;background:var(--band);text-align:center;padding:22px 18px 26px}
+.name{font:700 italic clamp(30px,8vw,46px)/1.15 "Poppins",Georgia,serif;color:#173F2E}
+
+#toast{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9;max-width:520px;margin:0 auto;background:#173F2E;color:#fff;padding:12px 16px;border-radius:12px;font:500 14px/1.6 "IBM Plex Sans Arabic",system-ui,sans-serif;display:none}
+#toast.show{display:block}
+@media (prefers-reduced-motion:reduce){.line{transition:none}}
+</style>
+</head>
+<body data-mode="both">
+
+<div class="bar">
+  <div class="wrap">
+    <div class="seg" role="group" aria-label="Language / اللغة">
+      <button type="button" data-mode="both" aria-pressed="true">عربي + English</button>
+      <button type="button" data-mode="en" aria-pressed="false">English</button>
+      <button type="button" data-mode="ar" aria-pressed="false">عربي</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <p class="hint">
+    <span class="en"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10v4h4l5 4V6L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>Tap any sentence to hear it</span>
+    <span class="ar" lang="ar" dir="rtl">اضغط على أي جملة لتسمعها</span>
+  </p>
+
+  <!-- Read: food conversation -->
+  <section class="panel read" aria-labelledby="h-read">
+    <div class="head">
+      <div class="ico" aria-hidden="true">📖</div>
+      <div class="txt">
+        <h2 class="en" id="h-read">Read: the conversation about food</h2>
+        <h2 class="ar" lang="ar" dir="rtl">اقرأ: المحادثة عن الطعام</h2>
+        <p class="ar" lang="ar" dir="rtl">المثال الموجود في الكتاب مع الترجمة</p>
+      </div>
+    </div>
+    <button type="button" class="play" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span class="en">Listen to the conversation</span><span class="ar" lang="ar" dir="rtl">استمع للمحادثة</span></button>
+
+    <div class="msg a"><div class="avatar" aria-hidden="true">A</div><div class="bubble">
+      <button type="button" class="line en" data-lang="en">Why don't we get some food?</button>
+      <button type="button" class="line ar" data-lang="ar" lang="ar">لماذا لا نأخذ بعض الطعام؟</button></div></div>
+    <div class="msg b"><div class="avatar" aria-hidden="true">B</div><div class="bubble">
+      <button type="button" class="line en" data-lang="en">That's a great idea. I'm hungry.</button>
+      <button type="button" class="line ar" data-lang="ar" lang="ar">هذه فكرة رائعة. أنا جائعة.</button></div></div>
+    <div class="msg a"><div class="avatar" aria-hidden="true">A</div><div class="bubble">
+      <button type="button" class="line en" data-lang="en">What shall we have?</button>
+      <button type="button" class="line ar" data-lang="ar" lang="ar">ماذا نأكل؟</button></div></div>
+    <div class="msg b"><div class="avatar" aria-hidden="true">B</div><div class="bubble">
+      <button type="button" class="line en" data-lang="en">Let's have dolma.</button>
+      <button type="button" class="line ar" data-lang="ar" lang="ar">لنأكل الدولمة.</button></div></div>
+    <div class="msg a"><div class="avatar" aria-hidden="true">A</div><div class="bubble">
+      <button type="button" class="line en" data-lang="en">Hmm, yes!</button>
+      <button type="button" class="line ar" data-lang="ar" lang="ar">همم، نعم!</button></div></div>
+
+    <div class="note ar" lang="ar" dir="rtl">
+      <span class="em" aria-hidden="true">🍽️</span>
+      <span><button type="button" class="word" data-say="dolma" data-lang="en">dolma</button> = دولمة: ورق عنب (أو خضار) محشي بالأرز، وهي أكلة شهيرة في تركيا وبلاد الشام.</span>
+    </div>
+  </section>
+
+  <!-- Solution: cinema conversation -->
+  <section class="panel solve" aria-labelledby="h-solve">
+    <div class="head">
+      <div class="ico" aria-hidden="true">🎬</div>
+      <div class="txt">
+        <h2 class="en" id="h-solve">Solution: the cinema conversation</h2>
+        <h2 class="ar" lang="ar" dir="rtl">الحل: محادثة السينما</h2>
+        <p class="ar" lang="ar" dir="rtl">الكلمات المظللة بالأصفر هي إجاباتك</p>
+      </div>
+    </div>
+
+    <div class="chips">
+      <button type="button" class="chip" data-say="go to the cinema" data-lang="en"><b>1</b>go to the cinema</button>
+      <button type="button" class="chip" data-say="a great idea" data-lang="en"><b>2</b>a great idea</button>
+      <button type="button" class="chip" data-say="shall we watch" data-lang="en"><b>3</b>shall we watch</button>
+      <button type="button" class="chip" data-say="watch a comedy" data-lang="en"><b>4</b>watch a comedy</button>
+      <button type="button" class="chip" data-say="Hmm, yes!" data-lang="en"><b>5</b>Hmm, yes!</button>
+    </div>
+
+    <button type="button" class="play" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span class="en">Listen to the conversation</span><span class="ar" lang="ar" dir="rtl">استمع للمحادثة</span></button>
+
+    <div class="msg a"><div class="avatar" aria-hidden="true">A</div><div class="bubble">
+      <button type="button" class="line en" data-lang="en">Why don't we <mark>go to the cinema</mark>?</button>
+      <button type="button" class="line ar" data-lang="ar" lang="ar">لماذا لا نذهب إلى السينما؟</button></div></div>
+    <div class="msg b"><div class="avatar" aria-hidden="true">B</div><div class="bubble">
+      <button type="button" class="line en" data-lang="en">That's <mark>a great idea</mark>.</button>
+      <button type="button" class="line ar" data-lang="ar" lang="ar">هذه فكرة رائعة.</button></div></div>
+    <div class="msg a"><div class="avatar" aria-hidden="true">A</div><div class="bubble">
+      <button type="button" class="line en" data-lang="en">What <mark>shall we watch</mark>?</button>
+      <button type="button" class="line ar" data-lang="ar" lang="ar">ماذا نشاهد؟</button></div></div>
+    <div class="msg b"><div class="avatar" aria-hidden="true">B</div><div class="bubble">
+      <button type="button" class="line en" data-lang="en">Let's <mark>watch a comedy</mark>.</button>
+      <button type="button" class="line ar" data-lang="ar" lang="ar">لنشاهد فيلمًا كوميديًا.</button></div></div>
+    <div class="msg a"><div class="avatar" aria-hidden="true">A</div><div class="bubble">
+      <button type="button" class="line en" data-lang="en"><mark>Hmm, yes!</mark></button>
+      <button type="button" class="line ar" data-lang="ar" lang="ar">همم، نعم!</button></div></div>
+  </section>
+
+</main>
+
+<footer class="foot"><div class="name">Dhuha Karim</div></footer>
+<div id="toast" role="status"></div>
+
+<script>
+(function(){
+  var body=document.body, synth=window.speechSynthesis, voices=[];
+  var PLAY='<path d="M8 5v14l11-7z"/>', STOP='<path d="M6 6h12v12H6z"/>';
+
+  /* language toggle */
+  var segs=document.querySelectorAll('.seg button');
+  function setMode(m){
+    body.setAttribute('data-mode',m);
+    segs.forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-mode')===m?'true':'false')});
+    try{localStorage.setItem('dialog-mode',m)}catch(e){}
+  }
+  segs.forEach(function(b){b.addEventListener('click',function(){stopAll();setMode(b.getAttribute('data-mode'))})});
+  try{var saved=localStorage.getItem('dialog-mode'); if(saved) setMode(saved);}catch(e){}
+
+  var playBtns=document.querySelectorAll('.play');
+  var toastEl=document.getElementById('toast'), toastT;
+  function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show')},5000)}
+
+  if(!synth){
+    playBtns.forEach(function(b){b.style.display='none'});
+    document.querySelector('.hint').style.display='none';
+    return;
+  }
+
+  function loadVoices(){voices=synth.getVoices()||[]}
+  loadVoices(); synth.onvoiceschanged=loadVoices;
+  function pick(lang){
+    var prefs=lang==='ar'?['ar']:['en-gb','en-us','en'];
+    for(var i=0;i<prefs.length;i++){
+      for(var j=0;j<voices.length;j++){
+        if(voices[j].lang.replace('_','-').toLowerCase().indexOf(prefs[i])===0) return voices[j];
+      }
+    }
+    return null;
+  }
+
+  var session=0, playing=false;
+  function clearUI(){document.querySelectorAll('.speaking').forEach(function(e){e.classList.remove('speaking')})}
+  function setPlay(btn,on){
+    playBtns.forEach(function(b){
+      var active=on&&b===btn;
+      b.setAttribute('aria-pressed',active?'true':'false');
+      b.querySelector('svg').innerHTML=active?STOP:PLAY;
+      b.querySelector('.en').textContent=active?'Stop':'Listen to the conversation';
+      b.querySelector('.ar').textContent=active?'إيقاف':'استمع للمحادثة';
+    });
+  }
+  function stopAll(){session++;playing=false;synth.cancel();clearUI();setPlay(null,false)}
+
+  function say(text,lang,el,done){
+    var my=++session;
+    synth.cancel(); clearUI();
+    if(lang==='ar' && voices.length && !pick('ar')){
+      toast('لا يوجد صوت عربي على جهازك. يمكنك تثبيته من إعدادات الجهاز (تحويل النص إلى كلام).');
+    }
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang=lang==='ar'?'ar-SA':'en-GB';
+    var v=pick(lang); if(v) u.voice=v;
+    u.rate=lang==='ar'?0.9:0.85;
+    if(el) el.classList.add('speaking');
+    function end(){
+      if(my!==session) return;
+      if(el) el.classList.remove('speaking');
+      if(done) done();
+    }
+    u.onend=end; u.onerror=end;
+    synth.speak(u);
+  }
+
+  /* tap any sentence, chip or word */
+  document.addEventListener('click',function(e){
+    var el=e.target.closest('.line,.chip,.word'); if(!el) return;
+    var text=(el.getAttribute('data-say')||el.textContent).replace(/\s+/g,' ').trim();
+    var wasSpeaking=el.classList.contains('speaking');
+    if(playing) stopAll();
+    if(wasSpeaking){stopAll();return}
+    say(text,el.getAttribute('data-lang')||'en',el);
+  });
+
+  /* play a whole conversation */
+  playBtns.forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(playing){stopAll();return}
+      var panel=btn.closest('.panel');
+      var lang=body.getAttribute('data-mode')==='ar'?'ar':'en';
+      var lines=Array.prototype.filter.call(panel.querySelectorAll('.line.'+lang),function(l){return l.offsetParent!==null});
+      var i=0; playing=true; setPlay(btn,true);
+      (function next(){
+        if(!playing||i>=lines.length){playing=false;setPlay(null,false);return}
+        var l=lines[i++];
+        l.scrollIntoView({block:'center',behavior:'smooth'});
+        say(l.textContent.replace(/\s+/g,' ').trim(),lang,l,next);
+      })();
+    });
+  });
+})();
+</script>
+</body>
+</html>
