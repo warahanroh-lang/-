@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Match the sections – Audio</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fffdf5;--fg:#1d2b53;--card:#fff;--bd:#e6dfc8;--ac:#2f6fed}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181f;--fg:#eef1f8;--card:#20242e;--bd:#333a48;--ac:#6ea0ff}}
+:root[data-theme="dark"]{--bg:#15181f;--fg:#eef1f8;--card:#20242e;--bd:#333a48;--ac:#6ea0ff}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px}
+h1{font-size:1.3rem;text-align:center}
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:10px auto;max-width:480px}
+.l{font-weight:700;width:1.5em}
+.t{flex:1;font-size:1.1rem}
+.t small{display:block;opacity:.7;font-size:.8rem}
+button{border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:1rem;padding:10px 14px}
+.bar{display:flex;gap:10px;max-width:480px;margin:10px auto}.bar button{flex:1}#msg{text-align:center;font-size:.9rem;min-height:1.2em}
+.all{display:block;margin:14px auto;max-width:480px;width:100%}
+</style>
+</head>
+<body>
+<h1>🔊 Tap a word to hear it</h1>
+<div class="bar"><button id="copy">📋 Copy link</button><button id="share">📤 Share</button></div><div id="msg"></div>
+<div id="list"></div>
+<button class="all" id="all">▶ Play all</button>
+<script>
+var items=[["a","Cartoons","funny stories with small pictures"],["b","Jokes","short, funny stories"],["c","Poetry","writing with words that rhyme"],["d","Interviews","asking people questions about themselves"],["e","Town events","things happening in the town"],["f","Sports reports","descriptions of events, for example, football matches"],["g","School news","reports about school events"]];
+function say(t,cb){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.85;if(cb)u.onend=cb;speechSynthesis.speak(u);}catch(e){}}
+var list=document.getElementById("list");
+items.forEach(function(it){var d=document.createElement("div");d.className="row";d.innerHTML='<span class="l">'+it[0]+'</span><span class="t">'+it[1]+'<small>'+it[2]+'</small></span>';var b=document.createElement("button");b.textContent="🔊";b.onclick=function(){say(it[1]+". "+it[2])};d.appendChild(b);list.appendChild(d);});
+document.getElementById("all").onclick=function(){var i=0;(function next(){if(i<items.length){var it=items[i++];say(it[1]+". "+it[2],next);}})();};
+var LINK="https://claude.ai/artifact/2KW39fGUsb7tSbkZS9mbN2",msg=document.getElementById("msg");
+function note(t){msg.textContent=t;setTimeout(function(){msg.textContent=""},2500)}
+function fallbackCopy(){var a=document.createElement("textarea");a.value=LINK;document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}document.body.removeChild(a);note(ok?"Link copied ✓":LINK)}
+document.getElementById("copy").onclick=function(){try{navigator.clipboard.writeText(LINK).then(function(){note("Link copied ✓")},fallbackCopy)}catch(e){fallbackCopy()}};
+document.getElementById("share").onclick=function(){try{if(navigator.share){navigator.share({title:document.title,url:LINK}).catch(function(){})}else{fallbackCopy()}}catch(e){fallbackCopy()}};
+</script>
+</body>
+</html>
