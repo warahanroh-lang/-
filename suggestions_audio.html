@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lesson 2: Making Suggestions – Audio</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fffdf5;--fg:#1d2b53;--card:#fff;--bd:#e6dfc8;--ac:#2f6fed}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181f;--fg:#eef1f8;--card:#20242e;--bd:#333a48;--ac:#6ea0ff}}
+:root[data-theme="dark"]{--bg:#15181f;--fg:#eef1f8;--card:#20242e;--bd:#333a48;--ac:#6ea0ff}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px}
+h1{font-size:1.3rem;text-align:center}
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:10px auto;max-width:480px}
+.l{font-weight:700;width:1.5em}
+.t{flex:1;font-size:1.1rem}
+.t small{display:block;opacity:.7;font-size:.8rem}
+button{border:0;border-radius:10px;background:var(--ac);color:#fff;font-size:1rem;padding:10px 14px}
+.bar{display:flex;gap:10px;max-width:480px;margin:10px auto}.bar button{flex:1}#msg{text-align:center;font-size:.9rem;min-height:1.2em}
+h2{font-size:1rem;max-width:480px;margin:18px auto 0;opacity:.8}
+.all{display:block;margin:14px auto;max-width:480px;width:100%}
+</style>
+</head>
+<body>
+<h1>🔊 Making Suggestions — tap to listen</h1>
+<div class="bar"><button id="copy">📋 Copy link</button><button id="share">📤 Share</button></div><div id="msg"></div>
+<div id="list"></div>
+<button class="all" id="all">▶ Play all</button>
+<script>
+var secs=[
+["The basic idea",[["We use suggestions when we want to suggest an idea or activity to someone or a group, or ask for their opinion about an idea.","We use suggestions when we want to suggest an idea or activity to someone or a group, or ask for their opinion about an idea."]]],
+["Usage: when do we use it?",[["To suggest an idea or activity.","To suggest an idea or activity."],["To ask for someone's opinion.","To ask for someone's opinion."],["To make a suggestion.","To make a suggestion."]]],
+["The forms",[["1. Why don't we + base form + the rest of the sentence?","Number one. Why don't we, plus base form, plus the rest of the sentence. Use: to suggest an idea or activity, or to ask for someone's opinion."],["2. Shall we + base form + the rest of the sentence?","Number two. Shall we, plus base form, plus the rest of the sentence. Use: to ask for someone's opinion, or to make a suggestion."],["3. Let's + base form + the rest of the sentence.","Number three. Let's, plus base form, plus the rest of the sentence. Use: to make a suggestion."]]],
+["Examples",[["Why don't we start a new project?","Why don't we start a new project?"],["Shall we begin with the research?","Shall we begin with the research?"],["Let's work together.","Let's work together."]]],
+["Important note",[["Put a question mark (?) after Why don't we and Shall we.","Important note. When you use Why don't we and Shall we, put a question mark at the end of the sentence, because they ask a question."]]]
+];
+function say(t,cb){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang="en-GB";u.rate=.7;try{var v=speechSynthesis.getVoices().filter(function(x){return x.lang.replace("_","-")==="en-GB"})[0];if(v)u.voice=v;}catch(e){}if(cb)u.onend=cb;speechSynthesis.speak(u);}catch(e){}}
+var list=document.getElementById("list"),flat=[];
+secs.forEach(function(sc){var h=document.createElement("h2");h.textContent=sc[0];list.appendChild(h);sc[1].forEach(function(it){flat.push(it[1]);var d=document.createElement("div");d.className="row";var t=document.createElement("span");t.className="t";t.textContent=it[0];d.appendChild(t);var b=document.createElement("button");b.textContent="\uD83D\uDD0A";b.onclick=function(){say(it[1])};d.appendChild(b);list.appendChild(d);});});
+document.getElementById("all").onclick=function(){var i=0;(function next(){if(i<flat.length){say(flat[i++],next);}})();};
+var LINK="https://warahanroh-lang.github.io/-/suggestions_audio.html",msg=document.getElementById("msg");
+function note(t){msg.textContent=t;setTimeout(function(){msg.textContent=""},2500)}
+function fallbackCopy(){var a=document.createElement("textarea");a.value=LINK;document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}document.body.removeChild(a);note(ok?"Link copied ✓":LINK)}
+document.getElementById("copy").onclick=function(){try{navigator.clipboard.writeText(LINK).then(function(){note("Link copied ✓")},fallbackCopy)}catch(e){fallbackCopy()}};
+document.getElementById("share").onclick=function(){try{if(navigator.share){navigator.share({title:document.title,url:LINK}).catch(function(){})}else{fallbackCopy()}}catch(e){fallbackCopy()}};
+</script>
+</body>
+</html>
