@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لعبة الفاعل - Subject Challenge</title>
+<style>
+:root{--bg:#fffaf0;--card:#fff;--ink:#1e2a5a;--y:#ffd93d;--g:#2fb344;--r:#e5484d;--b:#3b82f6;--line:#e6e0cf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a33;--card:#1f2850;--ink:#f3f5ff;--line:#33407a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+.w{max-width:540px;margin:0 auto;padding:16px}
+h1{margin:0;text-align:center;background:var(--y);color:#1e2a5a;border-radius:40px;padding:12px;font-size:23px}
+.top{display:flex;justify-content:space-between;margin:14px 0 8px;font-weight:700}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--b);transition:width .3s}
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:16px;margin-top:14px}
+.tag{display:inline-block;font-size:13px;background:var(--y);color:#1e2a5a;border-radius:20px;padding:2px 12px;font-weight:700}
+.q{font-size:18px;font-weight:700;margin:12px 0 4px;line-height:1.6}
+.en{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:Georgia,serif;font-weight:700}
+.sent{direction:ltr;text-align:left;font-size:20px;font-family:Georgia,serif;background:rgba(59,130,246,.12);border-radius:12px;padding:10px 12px;margin:8px 0;line-height:1.6}
+.sent mark{background:var(--y);color:#1e2a5a;border-radius:6px;padding:0 4px}
+.opt{display:block;width:100%;text-align:start;font:inherit;font-size:17px;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:13px 14px;margin-top:10px;cursor:pointer}
+.opt.en{display:block;text-align:left}
+.opt.ok{background:var(--g);border-color:var(--g);color:#fff}
+.opt.no{background:var(--r);border-color:var(--r);color:#fff}
+.fb{margin-top:12px;padding:12px;border-radius:12px;line-height:1.7;display:none}
+.fb.show{display:block;background:rgba(255,217,61,.25)}
+.btn{display:block;width:100%;margin-top:14px;font:inherit;font-size:18px;font-weight:700;background:var(--b);color:#fff;border:0;border-radius:30px;padding:14px;cursor:pointer}
+.big{font-size:56px;text-align:center}
+.c{text-align:center}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>🎯 تحدي الفاعل (Subject)</h1>
+<div id="game">
+ <div class="top"><span id="n"></span><span id="sc"></span></div>
+ <div class="bar"><i id="pb"></i></div>
+ <div class="card">
+  <span class="tag" id="tag"></span>
+  <div class="q" id="q"></div>
+  <div class="sent hide" id="sent"></div>
+  <div id="opts"></div>
+  <div class="fb" id="fb"></div>
+  <button class="btn hide" id="next">التالي ➜</button>
+ </div>
+</div>
+<div id="end" class="card hide c">
+ <div class="big" id="em"></div>
+ <h2 id="res"></h2>
+ <p id="msg"></p>
+ <button class="btn" onclick="start()">🔄 العب مرة أخرى</button>
+</div>
+</div>
+<script>
+const FS="Find the complete subject. ابحث عن الفاعل كاملًا";
+const Q=[
+{t:"Complete Subject",q:FS,s:"The tall boy in the red shirt kicked the ball.",sub:"The tall boy in the red shirt",o:["The tall boy in the red shirt","The tall boy","the red shirt","boy"],e:"الفاعل الكامل يمتد حتى يصل إلى الفعل kicked. The tall boy نصف الفاعل فقط."},
+{t:"Complete Subject",q:FS,s:"My best friend's older sister is a doctor.",sub:"My best friend's older sister",o:["My best friend's older sister","My best friend's","older sister","My best friend"],e:"كل الكلمات قبل الفعل is تتبع الفاعل."},
+{t:"Trap: Time Phrase",q:"Which words are the subject? أي كلمات هي الفاعل؟",s:"Every morning, the teacher explains the lesson.",sub:"the teacher",o:["the teacher","Every morning","Every morning the teacher","the lesson"],e:"Every morning عبارة زمنية وليست فاعلًا. الفاعل the teacher ويأتي بعده الفعل explains."},
+{t:"Trap: Place Phrase",q:"Which words are the subject?",s:"In the garden, the children played football.",sub:"the children",o:["the children","the garden","In the garden","the garden the children"],e:"In the garden عبارة مكان. من الذي لعب؟ the children."},
+{t:"Compound Subject",q:FS,s:"After lunch, my father and my uncle watched TV.",sub:"my father and my uncle",o:["my father and my uncle","my father","my uncle watched","After lunch"],e:"الفاعل قد يتكون من شخصين متصلين بـ and، وكلاهما قام بالفعل watched."},
+{t:"Word Count",q:"كم كلمة في الفاعل؟",s:"The students in our class are very active.",sub:"The students in our class",o:["5","2","3","7"],e:"The / students / in / our / class = 5 كلمات، ثم الفعل are."},
+{t:"Word Count",q:"كم كلمة في الفاعل؟",s:"The little girl with the blue backpack walks to school.",sub:"The little girl with the blue backpack",o:["7","3","4","5"],e:"The little girl with the blue backpack = 7 كلمات، ثم الفعل walks."},
+{t:"Complete Subject",q:FS,s:"The old computer in our school stopped working.",sub:"The old computer in our school",o:["The old computer in our school","The old computer","our school","computer"],e:"الفاعل ينتهي عند الفعل stopped، فهو The old computer in our school."},
+{t:"Complete Subject",q:FS,s:"The beautiful bird on the tree sings every morning.",sub:"The beautiful bird on the tree",o:["The beautiful bird on the tree","The beautiful bird","the tree","every morning"],e:"كل ما قبل الفعل sings هو الفاعل، أما every morning فبعد الفعل."},
+{t:"Compound Subject",q:FS,s:"My younger brother and his friends are playing outside.",sub:"My younger brother and his friends",o:["My younger brother and his friends","My younger brother","his friends","brother and his"],e:"الفاعل الكامل يمتد حتى الفعل are."},
+{t:"Complete Subject",q:FS,s:"A group of students from Basra won the competition.",sub:"A group of students from Basra",o:["A group of students from Basra","A group of students","students from Basra","Basra"],e:"الفعل won يأتي بعد Basra مباشرة، لذلك الفاعل يتوقف عنده."},
+{t:"Complete Subject",q:FS,s:"The new teacher from Canada speaks Arabic well.",sub:"The new teacher from Canada",o:["The new teacher from Canada","The new teacher","Canada","teacher"],e:"الفاعل The new teacher from Canada = 5 كلمات."},
+{t:"Last Word of Subject",q:"أي كلمة هي آخر كلمة في الفاعل؟",s:"The students in our class are very active.",sub:"The students in our class",o:["class","students","are","active"],e:"are فعل، والكلمة التي قبله مباشرة (class) هي آخر كلمة في الفاعل."},
+{t:"Subject Pronoun",q:"Choose the subject pronoun. اختر ضمير الفاعل",s:"They are very active.",sub:"They",o:["They","are","very","active"],e:"They ضمير فاعل قبل الفعل are."},
+{t:"Not a Subject Pronoun",q:"Which word is NOT a subject pronoun?",o:["me","he","we","they"],e:"ضمائر الفاعل: I - you - he - she - it - we - they. أما me فليس ضمير فاعل."},
+{t:"Pronoun Sentence",q:"Which sentence starts with a subject pronoun?",o:["She opened the window.","The window opened.","Her brother opened it.","Opening the window."],e:"She ضمير فاعل، أما الباقي فيبدأ باسم أو عبارة أخرى."},
+{t:"Subject Type",q:"ما نوع الفاعل؟",s:"The old computer on the desk crashed.",sub:"The old computer on the desk",o:["عبارة اسمية","ضمير فاعل","اسم عاقل","فعل"],e:"لأنه مكوّن من عدة كلمات، فهو عبارة اسمية (Noun Phrase)."},
+{t:"Where is the Subject?",q:"الفاعل يتوقف امتداده عند الوصول إلى ...",o:["الفعل","نهاية الجملة","أول صفة","حرف الجر"],e:"الفاعل يأتي بعده فعل مباشرة."},
+{t:"Verb Hunt",q:"Find the verb first. ما الفعل؟",s:"The tall boy in the red shirt kicked the ball.",o:["kicked","boy","shirt","ball"],e:"kicked هو الفعل (حدث). كل ما قبله هو الفاعل: The tall boy in the red shirt."}
+];
+let i,s,done,order;
+const $=id=>document.getElementById(id);
+const sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const isEn=t=>/^[A-Za-z]/.test(t);
+function start(){order=sh(Q.map((x,k)=>k));i=0;s=0;$('game').classList.remove('hide');$('end').classList.add('hide');show()}
+function show(){
+ const x=Q[order[i]];done=false;
+ $('n').textContent="السؤال "+(i+1)+" / "+Q.length;$('sc').textContent="⭐ "+s;
+ $('pb').style.width=(i/Q.length*100)+"%";
+ $('tag').textContent=x.t;
+ $('q').innerHTML=x.q.replace(/([A-Za-z][A-Za-z .'?]*[A-Za-z?])/g,'<span class="en">$1</span>');
+ const st=$('sent');if(x.s){st.textContent=x.s;st.classList.remove('hide')}else st.classList.add('hide');
+ const o=$('opts');o.innerHTML="";
+ sh(x.o.map((t,k)=>({t,k}))).forEach(p=>{
+  const b=document.createElement('button');b.className='opt'+(isEn(p.t)?' en':'');
+  b.textContent=p.t;b.dataset.c=p.k===0?1:0;b.onclick=()=>pick(b,p.k===0);o.appendChild(b)});
+ $('fb').className='fb';$('next').classList.add('hide');
+}
+function pick(b,ok){
+ if(done)return;done=true;const x=Q[order[i]];
+ document.querySelectorAll('.opt').forEach(e=>{if(e.dataset.c==1)e.classList.add('ok')});
+ if(ok)s++;else b.classList.add('no');
+ if(x.s&&x.sub){$('sent').innerHTML=x.s.replace(x.sub,'<mark>'+x.sub+'</mark>')}
+ const f=$('fb');f.textContent=(ok?"✅ أحسنت! ":"❌ ليست الإجابة الصحيحة! ")+x.e;f.className='fb show';
+ $('sc').textContent="⭐ "+s;
+ $('next').textContent=i===Q.length-1?"النتيجة 🏆":"التالي ➜";$('next').classList.remove('hide');
+}
+$('next').onclick=()=>{i++;i<Q.length?show():fin()};
+function fin(){
+ $('game').classList.add('hide');$('end').classList.remove('hide');
+ const p=s/Q.length;
+ $('em').textContent=p>=.9?"🏆":p>=.6?"🌟":"💪";
+ $('res').textContent=s+" من "+Q.length;
+ $('msg').textContent=p>=.9?"ممتاز! أنت خبير في الفاعل!":p>=.6?"جيد جدًا! انتبه للفاعل الكامل حتى الفعل.":"لا بأس! تذكّر: الفاعل يمتد حتى يصل إلى الفعل.";
+}
+start();
+</script>
+</body>
+</html>
