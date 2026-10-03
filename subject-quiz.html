@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لعبة الفاعل Subject Quiz</title>
+<style>
+:root{--bg:#fffaf0;--card:#fff;--ink:#1e2a5a;--mut:#667;--y:#ffd93d;--g:#2fb344;--r:#e5484d;--b:#3b82f6;--line:#e6e0cf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a33;--card:#1f2850;--ink:#f3f5ff;--mut:#aab;--line:#33407a}}
+:root[data-theme="dark"]{--bg:#141a33;--card:#1f2850;--ink:#f3f5ff;--mut:#aab;--line:#33407a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;min-height:100%}
+.w{max-width:520px;margin:0 auto;padding:16px}
+h1{margin:0;text-align:center;background:var(--y);color:#1e2a5a;border-radius:40px;padding:12px;font-size:24px}
+.top{display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px;font-weight:700}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--b);transition:width .3s}
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:16px;margin-top:14px}
+.tag{display:inline-block;font-size:13px;background:var(--y);color:#1e2a5a;border-radius:20px;padding:2px 12px;font-weight:700}
+.q{font-size:19px;font-weight:700;margin:12px 0 4px;line-height:1.6}
+.en{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:Georgia,serif;font-weight:700}
+.sent{direction:ltr;text-align:left;font-size:20px;font-family:Georgia,serif;background:rgba(59,130,246,.1);border-radius:12px;padding:10px 12px;margin:8px 0}
+.opt{display:block;width:100%;text-align:start;font:inherit;font-size:17px;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:13px 14px;margin-top:10px;cursor:pointer}
+.opt:active{transform:scale(.98)}
+.opt.ok{background:var(--g);border-color:var(--g);color:#fff}
+.opt.no{background:var(--r);border-color:var(--r);color:#fff}
+.fb{margin-top:12px;padding:12px;border-radius:12px;font-size:16px;line-height:1.6;display:none}
+.fb.show{display:block;background:rgba(255,217,61,.25)}
+.btn{display:block;width:100%;margin-top:14px;font:inherit;font-size:18px;font-weight:700;background:var(--b);color:#fff;border:0;border-radius:30px;padding:14px;cursor:pointer}
+.big{font-size:56px;text-align:center}
+.c{text-align:center}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>🎯 لعبة الفاعل (Subject)</h1>
+<div id="game">
+ <div class="top"><span id="n"></span><span id="sc"></span></div>
+ <div class="bar"><i id="pb"></i></div>
+ <div class="card">
+  <span class="tag" id="tag"></span>
+  <div class="q" id="q"></div>
+  <div class="sent hide" id="sent"></div>
+  <div id="opts"></div>
+  <div class="fb" id="fb"></div>
+  <button class="btn hide" id="next">التالي ➜</button>
+ </div>
+</div>
+<div id="end" class="card hide c">
+ <div class="big" id="em"></div>
+ <h2 id="res"></h2>
+ <p id="msg"></p>
+ <button class="btn" onclick="start()">🔄 العب مرة أخرى</button>
+</div>
+</div>
+<script>
+const Q=[
+{t:"أين أجده؟",q:"أين يأتي الفاعل غالبًا في الجملة؟",o:["قبل الفعل","بعد المفعول به","في نهاية الجملة","بعد حرف الجر"],a:0,e:"الفاعل يأتي غالبًا في بداية الجملة وقبل الفعل."},
+{t:"أين أجده؟",q:"من هو الفاعل في الجملة؟",s:"The teacher explained the lesson.",o:["The teacher","explained","the lesson","explained the"],a:0,e:"The teacher هو من قام بالشرح، ويأتي قبل الفعل explained."},
+{t:"أين أجده؟",q:"الفاعل يأتي بعده ...",o:["فعل مباشرة","حرف جر","صفة فقط","علامة ترقيم"],a:0,e:"الفاعل يأتي بعده فعل مباشرة، أي يتوقف امتداده عند الوصول إلى الفعل."},
+{t:"كيف أجده؟",q:"ما الفاعل في هذه الجملة؟",s:"The computer stopped working.",o:["The computer","stopped","working","stopped working"],a:0,e:"The computer اسم غير عاقل قام بالفعل stopped."},
+{t:"كيف أجده؟",q:"ما هو الفاعل؟",o:["الشخص أو الشيء الذي يقوم بالفعل","الكلمة التي تدل على الحدث","الشيء الذي يقع عليه الفعل","كلمة تصف الاسم"],a:0,e:"الفاعل هو الشخص أو الشيء الذي يقوم بالفعل."},
+{t:"ضمير فاعل",q:"اختر الفاعل:",s:"They went to school.",o:["They","went","school","to"],a:0,e:"They ضمير فاعل (Subject Pronoun) يأتي قبل الفعل went."},
+{t:"ضمير فاعل",q:"أي كلمة من التالية ضمير فاعل؟",o:["she","teacher","school","lesson"],a:0,e:"ضمائر الفاعل: I - you - he - she - it - we - they."},
+{t:"عبارة اسمية",q:"ما الفاعل في هذه الجملة؟",s:"The students in our class are very active.",o:["The students in our class","our class","very active","are"],a:0,e:"الفاعل قد يكون عدة كلمات: The students in our class عبارة اسمية، وبعدها الفعل are."},
+{t:"كيف أجده؟",q:"هل يمكن أن يتكون الفاعل من أكثر من كلمة؟",o:["نعم، قد يكون عبارة اسمية","لا، كلمة واحدة فقط","فقط في الأسئلة","فقط مع الضمائر"],a:0,e:"قد يكون الفاعل كلمة واحدة أو عدة كلمات."},
+{t:"نوع الفاعل",q:"ما نوع الفاعل The teacher؟",o:["اسم عاقل","اسم غير عاقل","ضمير فاعل","عبارة اسمية"],a:0,e:"المعلم إنسان، لذلك هو اسم عاقل."},
+{t:"نوع الفاعل",q:"ما نوع الفاعل The computer؟",o:["اسم غير عاقل","اسم عاقل","ضمير فاعل","عبارة اسمية"],a:0,e:"الحاسوب شيء غير عاقل."},
+{t:"الفعل",q:"أي كلمة هي الفعل (تدل على حدث)؟",s:"The teacher explained the lesson.",o:["explained","teacher","lesson","The"],a:0,e:"explained تدل على حدث (الشرح)، والفاعل يسبقها."},
+{t:"كيف أجده؟",q:"ما الفاعل؟",s:"She plays football every day.",o:["She","plays","football","every day"],a:0,e:"She ضمير فاعل قبل الفعل plays."},
+{t:"عبارة اسمية",q:"ما نوع الفاعل The students in our class؟",o:["عبارة اسمية","ضمير فاعل","اسم غير عاقل","فعل"],a:0,e:"لأنه مكوّن من عدة كلمات (Noun Phrase)."},
+{t:"كيف أجده؟",q:"ما الفاعل؟",s:"My brother opened the door.",o:["My brother","opened","the door","door"],a:0,e:"My brother هو من فتح الباب، وبعده الفعل opened مباشرة."}
+];
+let i,s,done;
+const $=id=>document.getElementById(id);
+function sh(a){return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1])}
+function start(){i=0;s=0;Q.forEach((x,k)=>{});$('game').classList.remove('hide');$('end').classList.add('hide');show()}
+function show(){
+ const x=Q[i];done=false;
+ $('n').textContent="السؤال "+(i+1)+" / "+Q.length;$('sc').textContent="⭐ "+s;
+ $('pb').style.width=(i/Q.length*100)+"%";
+ $('tag').textContent=x.t;$('q').textContent=x.q;
+ const st=$('sent');if(x.s){st.textContent=x.s;st.classList.remove('hide')}else st.classList.add('hide');
+ const o=$('opts');o.innerHTML="";
+ sh(x.o.map((t,k)=>({t,k}))).forEach(p=>{
+  const b=document.createElement('button');b.className='opt';
+  b.innerHTML=/^[A-Za-z]/.test(p.t)?'<span class="en">'+p.t+'</span>':p.t;
+  b.onclick=()=>pick(b,p.k===x.a);b.dataset.c=p.k===x.a?1:0;o.appendChild(b)});
+ $('fb').className='fb';$('next').classList.add('hide');
+}
+function pick(b,ok){
+ if(done)return;done=true;
+ [...document.querySelectorAll('.opt')].forEach(e=>{if(e.dataset.c==1)e.classList.add('ok')});
+ if(ok)s++;else b.classList.add('no');
+ const f=$('fb');f.textContent=(ok?"✅ أحسنت! ":"❌ حاول مرة أخرى! ")+Q[i].e;f.className='fb show';
+ $('sc').textContent="⭐ "+s;
+ $('next').textContent=i===Q.length-1?"النتيجة 🏆":"التالي ➜";$('next').classList.remove('hide');
+}
+$('next').onclick=()=>{i++;if(i<Q.length)show();else fin()};
+function fin(){
+ $('game').classList.add('hide');$('end').classList.remove('hide');
+ const p=s/Q.length;
+ $('em').textContent=p>=.9?"🏆":p>=.6?"🌟":"💪";
+ $('res').textContent=s+" من "+Q.length;
+ $('msg').textContent=p>=.9?"ممتاز! أنت خبير في الفاعل!":p>=.6?"جيد جدًا! راجع الأسئلة التي أخطأت فيها.":"لا بأس! راجع الدرس وجرّب مرة أخرى.";
+}
+start();
+</script>
+</body>
+</html>
