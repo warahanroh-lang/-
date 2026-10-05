@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>تحدي عمّار: اعبر الجسر</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eaf4f1;--card:#fff;--ink:#17323a;--muted:#5b7078;--line:#cfe0dc;--accent:#0f7c8a;--ok:#1e9e5a;--okbg:#e3f6ea;--no:#d93f3f;--nobg:#fdeaea;--sun:#f5b335;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1f24;--card:#16303a;--ink:#e8f3f1;--muted:#9bb3b9;--line:#274853;--accent:#4cc3d1;--ok:#4cd68a;--okbg:#14382a;--no:#ff7a7a;--nobg:#3d1d22}}
+:root[data-theme="dark"]{--bg:#0e1f24;--card:#16303a;--ink:#e8f3f1;--muted:#9bb3b9;--line:#274853;--accent:#4cc3d1;--ok:#4cd68a;--okbg:#14382a;--no:#ff7a7a;--nobg:#3d1d22}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal",system-ui,"Segoe UI",Arial,sans-serif;line-height:1.6}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 40px}
+h1{font-size:1.45rem;margin:4px 0 2px;font-weight:800}
+.sub{color:var(--muted);margin:0 0 14px;font-size:.95rem}
+.track{display:flex;align-items:center;justify-content:space-between;margin:10px 0 16px;position:relative}
+.track:before{content:"";position:absolute;inset-inline:18px;top:50%;height:4px;background:var(--line);transform:translateY(-50%);border-radius:4px}
+.stone{position:relative;width:38px;height:38px;border-radius:50%;background:var(--card);border:3px solid var(--line);display:grid;place-items:center;font-weight:800;color:var(--muted);transition:.25s}
+.stone.cur{border-color:var(--accent);color:var(--accent);transform:scale(1.15)}
+.stone.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.stone.no{background:var(--no);border-color:var(--no);color:#fff}
+.score{display:flex;justify-content:space-between;font-weight:700;margin-bottom:8px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px}
+.ar{color:var(--muted);font-size:.95rem;margin:0 0 4px}
+.q{font-size:1.2rem;font-weight:700;margin:0 0 14px;direction:ltr;text-align:left}
+.opt{display:flex;gap:12px;align-items:center;width:100%;direction:ltr;text-align:left;font:inherit;font-size:1.02rem;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:transform .12s,border-color .2s,background .2s}
+.opt:hover:not(:disabled){border-color:var(--accent);transform:translateY(-1px)}
+.opt:focus-visible,.next:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.opt:disabled{cursor:default}
+.badge{flex:none;width:32px;height:32px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-weight:800}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}
+.opt.ok .badge{background:var(--ok);color:#fff}
+.opt.no{background:var(--nobg);border-color:var(--no);animation:shake .35s}
+.opt.no .badge{background:var(--no);color:#fff}
+.opt.dim{opacity:.55}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.exp{margin-top:6px;padding:14px;border-radius:14px;border:2px solid;font-size:1rem}
+.exp.ok{background:var(--okbg);border-color:var(--ok)}
+.exp.no{background:var(--nobg);border-color:var(--no)}
+.exp b.t{display:block;font-size:1.05rem;margin-bottom:4px}
+.exp.ok b.t{color:var(--ok)}.exp.no b.t{color:var(--no)}
+.ev{direction:ltr;text-align:left;margin:8px 0 0;font-style:italic;color:var(--muted);font-size:.92rem;border-inline-start:0;border-left:3px solid var(--sun);padding-left:10px}
+.hid{display:none}
+.next{display:block;width:100%;margin-top:14px;font:inherit;font-weight:800;font-size:1.05rem;background:var(--accent);color:#fff;border:0;border-radius:14px;padding:13px;cursor:pointer}
+.end{text-align:center}
+.big{font-size:3rem;font-weight:800;margin:6px 0}
+.stars{font-size:2rem;letter-spacing:4px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏀 تحدي عمّار: اعبر الجسر</h1>
+  <p class="sub">اقرأ الجملة، اختر الإجابة الصحيحة، وعبر الحجارة الخمس.</p>
+  <p class="sub" style="margin-top:-8px;font-weight:700;color:var(--accent)">✏️ إعداد: Dhuha Karim</p>
+  <div class="track" id="track"></div>
+  <div class="score"><span id="sc">النقاط: 0</span><span id="qn"></span></div>
+  <div class="card" id="game"></div>
+</div>
+<script>
+var Q=[
+{ar:"قرر عمّار أن يقفز من فوق الجسر لأن:",q:"1. Ammar decided to jump off the bridge because…",
+o:["it didn’t look very high looking down from above.","he didn’t want to feel embarrassed in front of his friends.","he was a good swimmer and wasn’t scared of high places."],c:1,
+e:["النص يقول إن الجسر بدا أعلى بكثير عند النظر من الأعلى، وكان الأمر مخيفًا قليلًا، فلا يمكن أن يكون السبب.","السبب الحقيقي هو أن أصدقاءه كانوا يشاهدونه، فلم يرغب في التراجع أمامهم.","النص لم يذكر أنه سباح ماهر، بل قال إن الأمر كان مخيفًا. القفز كان بسبب أصدقائه."],
+ev:"“…but my friends were all watching, so I couldn’t give up now.”"},
+{ar:"أصيب عمّار في ظهره لأن:",q:"2. Ammar hurt his back because…",
+o:["he fell into the water in a bad position.","he hit the side of the bridge when he fell.","he hit the bottom of the river when he dived."],c:2,
+e:["النص لم يذكر وضعية سقوطه في الماء. ذكر أن النهر لم يكن عميقًا بما يكفي.","النص لم يقل إنه اصطدم بجانب الجسر. الاصطدام كان بقاع النهر.","أخبره والده أن النهر لم يكن عميقًا وأنه ارتطم بالقاع عندما غاص، فأصيب في ظهره."],
+ev:"“…the river wasn’t deep enough and I hit the bottom when I dived.”"},
+{ar:"في اليوم الذي استيقظ فيه في المستشفى، عمّار:",q:"3. On the day he woke up in hospital, Ammar…",
+o:["was told he would wear an exoskeleton.","knew he would never be able to walk again.","realized how one choice could change the rest of his life."],c:2,
+e:["الهيكل الخارجي جاء لاحقًا بعد أشهر من العلاج الطبيعي، ولم يُذكر في يوم استيقاظه.","الأطباء قالوا إنه «ربما» لن يمشي مرة أخرى، وهذا ليس يقينًا بأنه لن يمشي أبدًا.","وهو يستمع لوالده فكّر كيف غيّر قرار واحد حياته كلها، وقرر أن يبذل كل جهده ليمشي من جديد."],
+ev:"“…I was thinking about that moment and how one decision changed my whole life.”"},
+{ar:"أكثر شيء أراد عمّار فعله هو:",q:"4. The thing Ammar most wanted to do was…",
+o:["play basketball again.","hang out with his friends again.","go back to school."],c:0,
+e:["قال إنه يريد أن يقف ويمشي، وأكثر من أي شيء آخر، أن يعود للعب كرة السلة.","التسكع مع الأصدقاء كان ممكنًا له على الكرسي المتحرك، لكنه أراد ما هو أكثر.","العودة للمدرسة كانت ممكنة له بكرسيه المتحرك، لكنها لم تكن أمنيته الأكبر."],
+ev:"“…and more than anything, go back to playing basketball.”"},
+{ar:"في اليوم الذي جرّب فيه عمّار الهيكل الخارجي، كان قادرًا على:",q:"5. On the day Ammar tried the exoskeleton, he was able to…",
+o:["only stand up.","stand up and walk.","play basketball."],c:1,
+e:["لم يقف فقط، بل مشى أيضًا. الهيكل يساعد على الوقوف والمشي معًا.","الهيكل ساعده على الوقوف والمشي، وقد وصف الشعور بأنه مذهل بعد نحو ستة أشهر.","لعب كرة السلة جاء لاحقًا بعد أن واصل علاجه، وليس في يوم التجربة الأولى."],
+ev:"“…it would help me to not only stand up, but also to walk.”"}
+];
+var i=0,score=0,res=[],L=["a","b","c"];
+var $=function(id){return document.getElementById(id)};
+function track(){
+  var h="";
+  for(var k=0;k<Q.length;k++){
+    var cl=res[k]===1?"ok":res[k]===0?"no":(k===i?"cur":"");
+    h+='<div class="stone '+cl+'">'+(res[k]===1?"✓":res[k]===0?"✕":(k+1))+'</div>';
+  }
+  $("track").innerHTML=h;
+  $("sc").textContent="النقاط: "+score;
+  $("qn").textContent="سؤال "+Math.min(i+1,Q.length)+" من "+Q.length;
+}
+function show(){
+  var d=Q[i];track();
+  var h='<p class="ar">'+d.ar+'</p><p class="q" dir="ltr">'+d.q+'</p>';
+  for(var k=0;k<3;k++)h+='<button class="opt" data-k="'+k+'"><span class="badge">'+L[k].toUpperCase()+'</span><span>'+d.o[k]+'</span></button>';
+  h+='<div id="fb" class="hid"></div><button id="nx" class="next hid">'+(i<Q.length-1?"السؤال التالي":"شاهد النتيجة")+'</button>';
+  $("game").innerHTML=h;
+  var b=document.querySelectorAll(".opt");
+  for(var k=0;k<b.length;k++)b[k].onclick=pick;
+  $("nx").onclick=function(){i++;i<Q.length?show():finish()};
+}
+function pick(e){
+  var k=+e.currentTarget.getAttribute("data-k"),d=Q[i],right=k===d.c;
+  var b=document.querySelectorAll(".opt");
+  for(var j=0;j<b.length;j++){
+    b[j].disabled=true;
+    if(j===k)b[j].classList.add(right?"ok":"no");
+    else if(j===d.c){b[j].classList.add("ok")}
+    else b[j].classList.add("dim");
+  }
+  res[i]=right?1:0;if(right)score+=10;
+  var f=$("fb");f.className="exp "+(right?"ok":"no");
+  var t=right?"✅ إجابة صحيحة! +10 نقاط":"❌ إجابة خاطئة";
+  var body="<span>"+d.e[k]+"</span>";
+  if(!right)body+='<br><br><b>✅ الإجابة الصحيحة هي ('+L[d.c].toUpperCase()+'):</b> '+d.e[d.c];
+  f.innerHTML='<b class="t">'+t+'</b>'+body+'<p class="ev">'+d.ev+'</p>';
+  $("nx").classList.remove("hid");
+  track();f.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function finish(){
+  i=Q.length;track();
+  var n=score/10,st=n>=5?"⭐⭐⭐":n>=3?"⭐⭐":n>=1?"⭐":"☆";
+  var msg=n===5?"ممتاز! عبرت الجسر بلا أي سقوط 🏀":n>=3?"أحسنت! راجع الأسئلة التي أخطأت فيها":"لا بأس، اقرأ القطعة مرة أخرى وحاول من جديد";
+  $("game").innerHTML='<div class="end"><div class="stars">'+st+'</div><div class="big">'+n+' / 5</div><p>'+msg+'</p><button class="next" id="rs">العب مرة أخرى</button></div>';
+  $("rs").onclick=function(){i=0;score=0;res=[];show()};
+}
+show();
+</script>
+</body>
+</html>
