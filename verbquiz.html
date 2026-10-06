@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>تحدي الفعل: أين أجده؟</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#eaf5ff;--card:#fff;--ink:#16324f;--muted:#5d7690;--line:#c9e0f5;--blue:#2f86e0;--ok:#1e9e5a;--okbg:#e2f7ea;--no:#d93f3f;--nobg:#fdeaea;--sun:#ffb62e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal",system-ui,"Segoe UI",Arial,sans-serif;line-height:1.6;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:600px;margin:0 auto;padding:14px 14px 40px}
+header{text-align:center}
+h1{font-size:1.5rem;margin:4px 0;font-weight:800;color:var(--blue)}
+.by{display:inline-block;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:3px 16px;font-weight:700;font-size:.95rem}
+.by b{color:var(--blue)}
+.track{display:flex;gap:5px;margin:14px 0 8px}
+.dot{flex:1;height:10px;border-radius:6px;background:var(--line);transition:.25s}
+.dot.cur{background:var(--blue)}.dot.ok{background:var(--ok)}.dot.no{background:var(--no)}
+.score{display:flex;justify-content:space-between;font-weight:700;margin-bottom:8px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px}
+.tag{display:inline-block;font-weight:800;font-size:1.05rem;padding:4px 14px;border-radius:999px;margin-bottom:6px}
+.t-verb{background:#ffe3ee;color:#c21f60}.t-aux{background:#fff1cc;color:#a86a00}.t-main{background:#e8e0ff;color:#5b34c9}
+.hint{color:var(--muted);font-size:.95rem;margin:0 0 14px}
+.sent{direction:ltr;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 0 14px}
+.w{font:inherit;font-weight:700;font-size:1.3rem;color:var(--ink);background:#f3f9ff;border:2px solid var(--line);border-radius:12px;padding:6px 14px;cursor:pointer;transition:transform .12s}
+.w:hover:not(:disabled){border-color:var(--blue);transform:translateY(-2px)}
+.w:disabled{cursor:default}
+.w.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok);animation:pop .5s}
+.w.no{background:var(--nobg);border-color:var(--no);color:var(--no);animation:shake .4s}
+.fb{margin-top:6px;padding:14px;border-radius:14px;font-size:1rem}
+.fb.ok{background:var(--okbg);border:2px solid var(--ok)}
+.fb.no{background:var(--nobg);border:2px solid var(--no)}
+.fb .t{display:block;font-size:1.12rem;font-weight:800;margin-bottom:4px}
+.fb.ok .t{color:var(--ok)}.fb.no .t{color:var(--no)}
+.stars{display:inline-block;animation:pop .6s}
+.ex{direction:ltr;text-align:left;margin:8px 0 0;font-weight:700;color:var(--muted)}
+.btn{display:block;width:100%;margin-top:14px;font:inherit;font-weight:800;font-size:1.05rem;background:var(--blue);color:#fff;border:0;border-radius:14px;padding:13px;cursor:pointer}
+.qa{font-size:1.15rem;font-weight:800;margin:0 0 12px}
+.opt{display:block;width:100%;text-align:right;font:inherit;font-size:1.05rem;font-weight:700;color:var(--ink);background:#f3f9ff;border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--blue)}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok);animation:pop .5s}
+.opt.no{background:var(--nobg);border-color:var(--no);color:var(--no);animation:shake .4s}
+.hid{display:none}
+.end{text-align:center}.big{font-size:3rem;font-weight:800;color:var(--blue)}.bigstars{font-size:2rem;letter-spacing:3px}
+footer{text-align:center;color:var(--muted);font-size:.9rem;margin-top:12px}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🔎 تحدي الفعل: أين أجده؟</h1>
+    <div class="by">إعداد: <b dir="auto">الأستاذة Dhuha Karim</b></div>
+  </header>
+  <div class="track" id="track"></div>
+  <div class="score"><span id="sc">النقاط: 0</span><span id="qn"></span></div>
+  <div class="card" id="game"></div>
+  <footer>🌟 بالتوفيق يا أبطال 🌟</footer>
+</div>
+<script>
+var T={
+ verb:{c:"t-verb",n:"🔴 اضغط على الفعل (Verb)",h:"اسأل: من هو الفاعل؟ ثم: ماذا يفعل الفاعل؟ الإجابة هي الفعل."},
+ aux:{c:"t-aux",n:"🟡 اضغط على الفعل المساعد (Auxiliary Verb)",h:"الفعل المساعد يأتي قبل الفعل الرئيسي ليساعده في تكوين الزمن أو النفي أو السؤال."},
+ main:{c:"t-main",n:"🟣 اضغط على الفعل الرئيسي (Main Verb)",h:"الفعل الرئيسي هو الذي يحمل المعنى الأساسي، أي ما يفعله الفاعل."}
+};
+var Q=[
+{t:"verb",s:"Ali plays football.",a:"plays",e:"الفاعل هو Ali، وسؤالنا: ماذا يفعل Ali؟ يلعب. لذلك الفعل هو plays.",x:{Ali:"Ali اسم (فاعل) وليس فعلًا.",football:"football اسم، أي هي الشيء الذي يُلعب."}},
+{t:"verb",s:"The birds sing in the morning.",a:"sing",e:"الفاعل هو The birds، وماذا تفعل الطيور؟ تغرّد. لذلك الفعل هو sing.",x:{birds:"birds اسم (الفاعل) وليس فعلًا.",morning:"morning اسم يدل على الوقت."}},
+{t:"verb",s:"My mother cooks dinner.",a:"cooks",e:"الفاعل هو My mother، وماذا تفعل أمي؟ تطبخ. لذلك الفعل هو cooks.",x:{mother:"mother اسم (الفاعل) وليس فعلًا.",dinner:"dinner اسم، وهو ما يُطبخ."}},
+{t:"verb",s:"Students write their lessons.",a:"write",e:"الفاعل هو Students، وماذا يفعل الطلاب؟ يكتبون. لذلك الفعل هو write.",x:{Students:"Students اسم (الفاعل) وليس فعلًا.",lessons:"lessons اسم، وهو ما يُكتب."}},
+{t:"aux",m:1,q:"أين نجد الفعل المساعد في الجملة الخبرية؟",o:[["في بداية الجملة قبل الفاعل",0,"هذا مكان الفعل المساعد في الجملة الاستفهامية فقط، مثل: Does Omar study English؟"],["بعد الفاعل وقبل الفعل الرئيسي",1,"في الجملة الخبرية يأتي الفاعل أولًا، ثم الفعل المساعد، ثم الفعل الرئيسي."],["في نهاية الجملة",0,"الفعل المساعد لا يأتي في نهاية الجملة، بل قبل الفعل الرئيسي."]],x:"Sara is reading a book.  |  She can swim."},
+{t:"aux",s:"Sara is reading a book.",a:"is",e:"في الجملة فعلان: is و reading. الفعل المساعد هو is لأنه يساعد الفعل الرئيسي reading في تكوين زمن المضارع المستمر.",x:{reading:"reading هو الفعل الرئيسي لأنه يحمل المعنى (تقرأ)، وليس المساعد.",book:"book اسم وليس فعلًا."}},
+{t:"aux",s:"She can swim.",a:"can",e:"can فعل ناقص (Modal) يعمل كفعل مساعد، ويأتي قبل الفعل الرئيسي swim ليدل على القدرة.",x:{swim:"swim هو الفعل الرئيسي لأنه يحمل المعنى (تسبح)."}},
+{t:"aux",s:"Does Omar study English?",a:"Does",e:"الفعل المساعد Does يساعد في تكوين السؤال، أما الفعل الرئيسي فهو study.",x:{study:"study هو الفعل الرئيسي لأنه يحمل المعنى (يدرس).",Omar:"Omar اسم (فاعل) وليس فعلًا.",English:"English اسم يدل على المادة."}},
+{t:"aux",m:1,q:"أين نجد الفعل المساعد في الجملة الاستفهامية؟",o:[["بعد الفاعل وقبل الفعل الرئيسي",0,"هذا مكانه في الجملة الخبرية، مثل: Omar does study English."],["في بداية الجملة قبل الفاعل",1,"في السؤال ينتقل الفعل المساعد إلى بداية الجملة قبل الفاعل، فنقول: Does Omar study English؟"],["في نهاية الجملة",0,"الفعل المساعد لا يأتي في نهاية الجملة، بل في بدايتها في السؤال."]],x:"Does Omar study English?  |  Is Sara reading a book?"},
+{t:"main",s:"Ali is playing football.",a:"playing",e:"الفعل المساعد هو is، أما الفعل الرئيسي فهو playing لأنه يحمل المعنى الأساسي، أي ما يفعله Ali وهو اللعب.",x:{is:"is فعل مساعد، يساعد الفعل الرئيسي ولا يحمل المعنى الأساسي.",football:"football اسم وليس فعلًا."}},
+{t:"main",s:"They do not eat meat.",a:"eat",e:"do فعل مساعد، و not أداة نفي. أما الفعل الرئيسي فهو eat لأنه يحمل معنى ما يفعله الفاعل.",x:{do:"do فعل مساعد استُخدم هنا لتكوين النفي.",not:"not أداة نفي وليست فعلًا.",meat:"meat اسم، أي ما يُؤكل."}},
+{t:"main",s:"You must wash your hands.",a:"wash",e:"must فعل ناقص (Modal) يعمل كفعل مساعد، أما الفعل الرئيسي فهو wash لأنه يحمل المعنى الأساسي وهو الغسل.",x:{must:"must فعل مساعد (Modal) وليس الفعل الرئيسي.",hands:"hands اسم، وهو ما يُغسل."}}
+];
+var i=0,score=0,res=[];
+var $=function(x){return document.getElementById(x)};
+function clean(w){return w.replace(/[.,?!]/g,"")}
+function track(){
+  var h="";for(var k=0;k<Q.length;k++)h+='<div class="dot '+(res[k]===1?"ok":res[k]===0?"no":(k===i?"cur":""))+'"></div>';
+  $("track").innerHTML=h;$("sc").textContent="النقاط: "+score;$("qn").textContent="سؤال "+Math.min(i+1,Q.length)+" من "+Q.length;
+}
+function showM(d,t){
+  var h='<span class="tag '+t.c+'">🟡 سؤال عن الفعل المساعد</span><p class="hint">اختر الإجابة الصحيحة.</p><p class="qa">'+d.q+'</p>';
+  for(var k=0;k<d.o.length;k++)h+='<button class="opt" data-k="'+k+'">'+"أبج"[k]+") "+d.o[k][0]+'</button>';
+  h+='<div id="fb" class="hid"></div><button id="nx" class="btn hid">'+(i<Q.length-1?"السؤال التالي":"شاهد النتيجة")+'</button>';
+  $("game").innerHTML=h;
+  var b=document.querySelectorAll(".opt");for(var k=0;k<b.length;k++)b[k].onclick=pickM;
+  $("nx").onclick=function(){i++;i<Q.length?show():finish()};
+}
+function pickM(e){
+  var d=Q[i],k=+e.currentTarget.getAttribute("data-k"),ok=d.o[k][1]===1,c=0,b=document.querySelectorAll(".opt");
+  for(var j=0;j<d.o.length;j++)if(d.o[j][1]===1)c=j;
+  for(var j=0;j<b.length;j++){b[j].disabled=true;if(j===k)b[j].classList.add(ok?"ok":"no");else if(j===c)b[j].classList.add("ok")}
+  res[i]=ok?1:0;if(ok)score++;
+  var f=$("fb");f.className="fb "+(ok?"ok":"no");
+  if(ok)f.innerHTML='<span class="t">🎉 أحسنت! <span class="stars">⭐⭐⭐</span></span>'+d.o[k][2];
+  else f.innerHTML='<span class="t">😢 للأسف، إجابة خاطئة</span>'+d.o[k][2]+'<br><b>✅ الإجابة الصحيحة: '+d.o[c][0]+'</b><br>'+d.o[c][2];
+  f.innerHTML+='<p class="ex">'+d.x+'</p>';
+  $("nx").classList.remove("hid");track();f.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function show(){
+  var d=Q[i],t=T[d.t];track();
+  if(d.m){showM(d,t);return}
+  var ws=d.s.split(" "),h='<span class="tag '+t.c+'">'+t.n+'</span><p class="hint">'+t.h+'</p><div class="sent">';
+  for(var k=0;k<ws.length;k++)h+='<button class="w" data-w="'+clean(ws[k])+'">'+ws[k]+'</button>';
+  h+='</div><div id="fb" class="hid"></div><button id="nx" class="btn hid">'+(i<Q.length-1?"السؤال التالي":"شاهد النتيجة")+'</button>';
+  $("game").innerHTML=h;
+  var b=document.querySelectorAll(".w");for(var k=0;k<b.length;k++)b[k].onclick=pick;
+  $("nx").onclick=function(){i++;i<Q.length?show():finish()};
+}
+function pick(e){
+  var d=Q[i],w=e.currentTarget.getAttribute("data-w"),ok=w===d.a,b=document.querySelectorAll(".w");
+  for(var k=0;k<b.length;k++){b[k].disabled=true;var v=b[k].getAttribute("data-w");
+    if(v===w)b[k].classList.add(ok?"ok":"no");else if(v===d.a)b[k].classList.add("ok")}
+  res[i]=ok?1:0;if(ok)score++;
+  var f=$("fb");f.className="fb "+(ok?"ok":"no");
+  if(ok)f.innerHTML='<span class="t">🎉 أحسنت! <span class="stars">⭐⭐⭐</span></span>'+d.e;
+  else f.innerHTML='<span class="t">😢 للأسف، إجابة خاطئة</span>'+(d.x[w]?d.x[w]+'<br>':'كلمة <b>'+w+'</b> ليست المطلوبة هنا.<br>')+'<b>✅ الإجابة الصحيحة: '+d.a+'</b><br>'+d.e;
+  f.innerHTML+='<p class="ex">'+d.s+'</p>';
+  $("nx").classList.remove("hid");track();f.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function finish(){
+  i=Q.length;track();
+  var n=Q.length,st=score>=n-1?"⭐⭐⭐⭐⭐":score>=n*.7?"⭐⭐⭐⭐":score>=n*.5?"⭐⭐⭐":score>=n*.25?"⭐⭐":"⭐";
+  var m=score===Q.length?"ممتاز! أنتِ بطلة الأفعال 🏆":score>=Q.length*.7?"رائع! راجعي الجمل الحمراء وستتقنين الدرس":"محاولة جيدة! اقرأي الشرح وأعيدي اللعب 💪";
+  $("game").innerHTML='<div class="end"><div class="bigstars">'+st+'</div><div class="big">'+score+' / '+Q.length+'</div><p>'+m+'</p><button class="btn" id="rs">العب مرة أخرى 🔄</button></div>';
+  $("rs").onclick=function(){i=0;score=0;res=[];show()};
+}
+show();
+</script>
+</body>
+</html>
