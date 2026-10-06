@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>تحدي الصحة: أسقط الكلمة الصحيحة</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#eaf5ff;--card:#fff;--ink:#16324f;--muted:#5d7690;--line:#c9e0f5;--blue:#2f86e0;--ok:#1e9e5a;--okbg:#e2f7ea;--no:#d93f3f;--nobg:#fdeaea;--sun:#ffb62e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 110px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal",system-ui,"Segoe UI",Arial,sans-serif;line-height:1.6;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:600px;margin:0 auto;padding:14px 14px 40px}
+header{text-align:center;padding:6px 0 4px}
+h1{font-size:1.5rem;margin:0;font-weight:800;color:var(--blue)}
+.by{display:inline-block;margin:6px 0 2px;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:3px 16px;font-weight:700;font-size:.95rem}
+.by b{color:var(--blue)}
+.hint{color:var(--muted);font-size:.92rem;margin:6px 0 0}
+.bank{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:10px;margin:12px 0;box-shadow:0 6px 16px rgba(47,134,224,.15)}
+.bank .top{display:flex;justify-content:space-between;font-weight:700;font-size:.9rem;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;direction:ltr}
+.chip{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;background:linear-gradient(#4ba0f2,#2f86e0);color:#fff;font-weight:800;font-size:1.05rem;padding:7px 14px;border-radius:12px;box-shadow:0 3px 0 #1f64ad}
+.chip.sel{outline:3px solid var(--sun);transform:translateY(-2px)}
+.chip.ghost{position:fixed;z-index:99;pointer-events:none;transform:translate(-50%,-120%) scale(1.1);opacity:.95}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px;transition:border-color .2s}
+.card.ok{border-color:var(--ok)}.card.no{border-color:var(--no)}
+.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;font-size:.9rem;margin-bottom:6px}
+.s{direction:ltr;text-align:left;font-size:1.1rem;margin:0;line-height:2.2}
+.blank{display:inline-block;min-width:96px;text-align:center;border:2px dashed var(--blue);border-radius:10px;padding:0 10px;margin:0 3px;background:#f3f9ff;font-weight:800;color:var(--blue);vertical-align:baseline}
+.blank.over{background:#fff3d6;border-color:var(--sun)}
+.blank.ok{border:2px solid var(--ok);background:var(--okbg);color:var(--ok);animation:pop .5s}
+.blank.no{border:2px solid var(--no);background:var(--nobg);color:var(--no);animation:shake .4s}
+.fb{margin-top:10px;padding:12px;border-radius:14px;font-size:.98rem}
+.fb.ok{background:var(--okbg);border:2px solid var(--ok)}
+.fb.no{background:var(--nobg);border:2px solid var(--no)}
+.fb .t{display:block;font-size:1.1rem;font-weight:800;margin-bottom:3px}
+.fb.ok .t{color:var(--ok)}.fb.no .t{color:var(--no)}
+.stars{display:inline-block;animation:pop .6s}
+.end{text-align:center;background:var(--card);border:2px solid var(--blue);border-radius:20px;padding:20px}
+.big{font-size:2.6rem;font-weight:800;color:var(--blue)}
+.btn{font:inherit;font-weight:800;font-size:1.05rem;background:var(--blue);color:#fff;border:0;border-radius:14px;padding:12px 26px;cursor:pointer;margin-top:8px}
+.hid{display:none}
+.spk{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#e4f1ff;border:2px solid var(--line);font-size:1rem;cursor:pointer;margin-inline-end:8px;vertical-align:middle;user-select:none;-webkit-user-select:none}
+.spk:active,.spk.on{background:var(--sun)}
+.cw{display:inline-flex;align-items:center;gap:4px}
+.cw .spk{margin:0;width:28px;height:28px;font-size:.85rem}
+.ask{margin-top:8px;font-size:.92rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.ask .spk{margin:0;flex:none}
+
+footer{text-align:center;color:var(--muted);font-size:.9rem;margin-top:10px}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🩺 تحدي الصحة: أسقط الكلمة الصحيحة</h1>
+    <div class="by">إعداد: <b id="nm" dir="auto"></b></div>
+    <p class="hint">اسحب الكلمة إلى الفراغ، أو المس الكلمة ثم المس الفراغ. اضغط 🔊 لسماع الكلمة أو الجملة.</p>
+  </header>
+  <div class="bank">
+    <div class="top"><span id="sc">النقاط: 0</span><span id="pr">0 / 8</span></div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div id="list"></div>
+  <div id="end" class="end hid"></div>
+  <footer>🌟 بالتوفيق يا أبطال 🌟</footer>
+</div>
+<script>
+var NAME="الأستاذة Dhuha Karim";
+document.getElementById("nm").textContent=NAME;
+var M={sneeze:"يعطس",sick:"يتقيأ، يشعر بالغثيان، مغثوث",bleeding:"ينزف",hurts:"يؤلم",broken:"مكسور",sore:"ملتهب ومؤلم",pain:"ألم",dizzy:"دوار"};
+var W=["bleeding","broken","hurts","pain","sick","sore","dizzy","sneeze"];
+var S=[
+{b:"Have you got a cold? No, I always ",a:" when I put pepper on my food.",w:"sneeze",e:"السؤال عن الزكام والجواب «لا»، فالمطلوب شيء يحدث بسبب الفلفل وليس بسبب المرض. الفلفل يهيّج الأنف فيجعلك تعطس، وبعد I always نحتاج فعلًا، لذلك sneeze (يعطس)."},
+{b:"He was ",a:" three times in the night. I think the food at the restaurant where he ate wasn’t very fresh.",w:"sick",e:"الطعام لم يكن طازجًا، والنتيجة المنطقية أنه تقيأ ثلاث مرات في الليل. بعد was نحتاج صفة، و was sick three times تعني «تقيأ ثلاث مرات»."},
+{b:"She cut her hand while she was chopping vegetables. It was a very deep cut and it was ",a:" a lot, so she had to go to hospital and have it stitched.",w:"bleeding",e:"الجرح عميق جدًا واحتاج إلى خياطة في المستشفى، والجرح العميق ينزف كثيرًا. وبعد was نستخدم الفعل بصيغة ing: was bleeding a lot (كان ينزف كثيرًا)."},
+{b:"My back ",a:" all the time. It only feels ok when I am lying down.",w:"hurts",e:"الفراغ يحتاج فعلًا لأن بعد My back (مفرد) يأتي فعل بنهاية s، والمعنى أن ظهري يؤلمني طوال الوقت ولا يرتاح إلا عند الاستلقاء، لذلك hurts."},
+{b:"She can’t play tennis. She has ",a:" her right arm.",w:"broken",e:"لا تستطيع لعب التنس لأنها كسرت ذراعها اليمنى. بعد has نحتاج التصريف الثالث للفعل (have/has + p.p) فنقول has broken."},
+{b:"I went swimming yesterday and now my eyes are ",a:" from the chemicals in the pool.",w:"sore",e:"عيناي تتأثران بالمواد الكيميائية في المسبح فتصبحان ملتهبتين ومؤلمتين. بعد are نحتاج صفة، و sore تصف عضوًا مؤلمًا ومتهيّجًا."},
+{b:"Where exactly is the ",a:" and how long have you had it?",w:"pain",e:"الطبيب يسأل المريض أين مكان الألم ومنذ متى يشعر به. بعد the نحتاج اسمًا، و pain (ألم) اسم، أما بقية الكلمات فأفعال أو صفات."},
+{b:"It was a very hot day and she hadn’t eaten or drunk anything all day. That’s why she suddenly went pale and felt ",a:" during the lesson.",w:"dizzy",e:"الحر الشديد وعدم الأكل والشرب يجعلان الإنسان يشحب لونه ويشعر بدوار. بعد felt نحتاج صفة تصف الشعور، فنقول felt dizzy."}
+];
+var $=function(i){return document.getElementById(i)};
+function uk(){
+  var v=speechSynthesis.getVoices(),pick=null,pref=["Daniel","Google UK English Female","Google UK English Male","Serena","Kate","Martha","Arthur"];
+  for(var k=0;k<pref.length&&!pick;k++)for(var j=0;j<v.length;j++)if(v[j].name.indexOf(pref[k])>-1&&/en[-_]GB/i.test(v[j].lang)){pick=v[j];break}
+  if(!pick)for(var j=0;j<v.length;j++)if(/en[-_]GB/i.test(v[j].lang)){pick=v[j];break}
+  return pick}
+function say(txt,el){
+  if(!window.speechSynthesis)return;
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(txt);u.lang="en-GB";u.rate=.7;u.pitch=1;
+    var v=uk();if(v)u.voice=v;
+    if(el){el.classList.add("on");u.onend=u.onerror=function(){el.classList.remove("on")}}
+    speechSynthesis.speak(u)}catch(x){}
+}
+if(window.speechSynthesis)speechSynthesis.getVoices();
+function sentence(i,full){var s=S[i];return (s.b+(full?s.w:" blank ")+s.a).replace(/\s+/g," ").trim()}
+var done=[],score=0,cnt=0,sel=null;
+function build(){
+  var h="";
+  S.forEach(function(s,i){h+='<div class="card" id="c'+i+'"><span class="num">'+(i+1)+'</span><p class="s" data-i="'+i+'"><span class="spk" data-i="'+i+'">🔊</span>'+s.b+'<span class="blank" data-i="'+i+'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>'+s.a+'</p><div class="ask"><span class="spk" data-i="'+i+'">🔊</span><span>هل تريد سماع الجملة؟ اضغط على الأيقونة الصوتية.</span></div><div class="fb hid" id="f'+i+'"></div></div>'});
+  $("list").innerHTML=h;
+  $("chips").innerHTML=W.map(function(w){return '<span class="cw"><span class="spk" data-say="'+w+'" title="listen">🔊</span><span class="chip" data-w="'+w+'">'+w+'</span></span>'}).join("");
+  var c=document.querySelectorAll(".chip");
+  for(var k=0;k<c.length;k++)c[k].addEventListener("pointerdown",down);
+  var q=document.querySelectorAll(".spk");
+  for(var k=0;k<q.length;k++)q[k].addEventListener("click",function(e){
+    var el=e.currentTarget,i=el.getAttribute("data-i"),w=el.getAttribute("data-say");
+    if(i!==null)say(sentence(+i,done[+i]),el);else say(w,el)});
+  var b=document.querySelectorAll(".blank");
+  for(var k=0;k<b.length;k++)b[k].addEventListener("click",function(e){if(!sel)return;if(sel){place(+e.currentTarget.getAttribute("data-i"),sel.getAttribute("data-w"));clearSel()}});
+}
+function clearSel(){if(sel)sel.classList.remove("sel");sel=null}
+var dr=null;
+function down(e){e.preventDefault();dr={el:e.currentTarget,w:e.currentTarget.getAttribute("data-w"),x:e.clientX,y:e.clientY,mv:false,g:null}}
+function cardAt(x,y){var el=document.elementFromPoint(x,y);return el&&el.closest?el.closest(".card"):null}
+document.addEventListener("pointermove",function(e){
+  if(!dr)return;
+  if(!dr.mv&&Math.hypot(e.clientX-dr.x,e.clientY-dr.y)>8){dr.mv=true;dr.g=dr.el.cloneNode(true);dr.g.className="chip ghost";document.body.appendChild(dr.g)}
+  if(dr.g){dr.g.style.left=e.clientX+"px";dr.g.style.top=e.clientY+"px";
+    var b=document.querySelectorAll(".blank.over");for(var k=0;k<b.length;k++)b[k].classList.remove("over");
+    var c=cardAt(e.clientX,e.clientY);if(c){var bl=c.querySelector(".blank");if(!bl.classList.contains("ok")&&!bl.classList.contains("no"))bl.classList.add("over")}}
+});
+document.addEventListener("pointerup",function(e){
+  if(!dr)return;
+  var b=document.querySelectorAll(".blank.over");for(var k=0;k<b.length;k++)b[k].classList.remove("over");
+  if(dr.mv){dr.g.remove();var c=cardAt(e.clientX,e.clientY);if(c)place(+c.id.slice(1),dr.w)}
+  else{if(sel===dr.el)clearSel();else{clearSel();sel=dr.el;sel.classList.add("sel")}}
+  dr=null;
+});
+function place(i,w){
+  if(done[i])return;done[i]=true;cnt++;
+  var s=S[i],ok=w===s.w,bl=document.querySelector('.blank[data-i="'+i+'"]'),f=$("f"+i),c=$("c"+i);
+  bl.textContent=w;bl.classList.remove("over");bl.classList.add(ok?"ok":"no");c.classList.add(ok?"ok":"no");
+  f.className="fb "+(ok?"ok":"no");
+  if(ok){score++;f.innerHTML='<span class="t">🎉 أحسنت! <span class="stars">⭐⭐⭐</span></span>الإجابة الصحيحة: <b>'+s.w+'</b> ('+M[s.w]+').<br>'+s.e}
+  else f.innerHTML='<span class="t">😢 للأسف، إجابة خاطئة</span>كلمة <b>'+w+'</b> تعني («'+M[w]+'») ولا تناسب معنى هذه الجملة.<br><b>✅ الحل الصحيح: '+s.w+'</b> ('+M[s.w]+')<br>'+s.e;
+  $("sc").textContent="النقاط: "+score;$("pr").textContent=cnt+" / 8";
+  f.scrollIntoView({behavior:"smooth",block:"nearest"});
+  if(cnt===S.length)setTimeout(finish,900);
+}
+function finish(){
+  var st=score>=7?"⭐⭐⭐⭐⭐":score>=5?"⭐⭐⭐⭐":score>=3?"⭐⭐⭐":score>=1?"⭐⭐":"⭐";
+  var m=score===8?"ممتاز! أنتِ بطلة المفردات 🏆":score>=5?"رائع! راجعي الجمل الحمراء وستصبحين أفضل":"محاولة جيدة! اقرأي الشرح وأعيدي اللعب 💪";
+  var e=$("end");e.className="end";e.innerHTML='<div class="stars" style="font-size:2rem">'+st+'</div><div class="big">'+score+' / 8</div><p>'+m+'</p><button class="btn" onclick="location.reload()">العب مرة أخرى 🔄</button>';
+  e.scrollIntoView({behavior:"smooth",block:"center"});
+}
+build();
+</script>
+</body>
+</html>
