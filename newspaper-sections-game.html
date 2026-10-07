@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Newspaper Sections Game</title>
+<style>
+:root{--bg:#d6f5d0;--ink:#1d2a44;--card:#ffffff;--blank:#e8eefc;--ok:#1fa971;--bad:#e5484d;--accent:#3b5bdb;--chip:#ffd43b;--shadow:#1d2a44;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2","Trebuchet MS","Segoe UI",system-ui,sans-serif;min-height:100vh;touch-action:manipulation}
+.wrap{max-width:760px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:clamp(26px,6vw,40px);margin:6px 0 2px;text-align:center;letter-spacing:-.5px}
+.sub{text-align:center;margin:0 0 14px;font-size:17px;opacity:.85}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.track{flex:1;height:16px;background:var(--blank);border-radius:99px;overflow:hidden;border:2px solid var(--ink)}
+#fill{height:100%;width:0;background:var(--ok);transition:width .4s}
+#score{font-weight:800;white-space:nowrap}
+.bank{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 0;display:flex;flex-wrap:wrap;gap:9px;justify-content:center;border-bottom:3px dashed var(--ink);margin-bottom:14px}
+.chip{font:inherit;font-weight:800;font-size:clamp(16px,4.4vw,20px);background:var(--chip);color:#1d2a44;border:3px solid #1d2a44;border-radius:14px;padding:8px 14px;box-shadow:0 4px 0 var(--shadow);cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none}
+.chip:active{transform:translateY(2px);box-shadow:0 2px 0 var(--shadow)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.drag{position:fixed;z-index:99;pointer-events:none;transform:rotate(-4deg) scale(1.08);margin:0}
+.row{display:flex;gap:12px;align-items:center;background:var(--card);border:3px solid var(--ink);border-radius:18px;padding:12px 14px;margin-bottom:12px;box-shadow:0 5px 0 var(--shadow)}
+.row .l{flex:none;width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:20px;display:grid;place-items:center}
+.row .t{font-size:clamp(17px,4.6vw,22px);line-height:1.9}
+.blank{display:inline-block;min-width:130px;min-height:40px;vertical-align:middle;text-align:center;background:var(--blank);border:3px dashed var(--ink);border-radius:12px;padding:3px 10px;font-weight:800;line-height:1.5;margin:0 2px;cursor:pointer}
+.blank.hot{border-color:var(--accent);background:#dbe4ff;color:#1d2a44}
+.blank.ok{border-style:solid;border-color:var(--ok);background:var(--ok);color:#fff;cursor:default}
+.blank.shake{animation:sh .4s;border-color:var(--bad)}
+@keyframes sh{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.hint{text-align:center;font-size:15px;opacity:.8;margin:0 0 10px}
+#win{display:none;text-align:center;background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:20px;box-shadow:0 6px 0 var(--shadow)}
+#win h2{margin:0 0 6px;font-size:30px}
+button.go{font:inherit;font-weight:800;font-size:20px;background:var(--accent);color:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px 24px;box-shadow:0 4px 0 var(--shadow);cursor:pointer;margin-top:10px}
+canvas{position:fixed;inset:0;pointer-events:none;z-index:200}
+@media (prefers-reduced-motion:reduce){.blank.shake{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📰 Newspaper Sections</h1>
+  <p class="sub">Fill each gap with the right section.</p>
+  <div class="bar"><div class="track"><div id="fill"></div></div><div id="score">0 / 7</div></div>
+  <p class="hint">Drag a word into a gap, or tap a word to fill the next gap.</p>
+  <div class="bank" id="bank"></div>
+  <div id="rows"></div>
+  <div id="win"><h2>🎉 Excellent work!</h2><div id="msg"></div><button class="go" id="again">Play again</button></div>
+</div>
+<canvas id="cv"></canvas>
+<script>
+const Q=[
+["a","Cartoons","__ are funny stories with small pictures."],
+["b","Jokes","__ are short, funny stories."],
+["c","Poetry","__ is writing with words that rhyme."],
+["d","Interviews","__ are asking people questions about themselves."],
+["e","Town events","__ are things happening in the town."],
+["f","Sports reports","__ are descriptions of events, for example, football matches."],
+["g","School news","__ are reports about school events."]];
+const bank=document.getElementById('bank'),rows=document.getElementById('rows');
+let done=0,mistakes=0,selected=null;
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function build(){
+  bank.innerHTML='';rows.innerHTML='';done=0;mistakes=0;selected=null;
+  document.getElementById('win').style.display='none';upd();
+  Q.forEach(([k,w,s])=>{
+    const r=document.createElement('div');r.className='row';
+    const [pre,post]=s.split('__');
+    r.innerHTML='<div class="l">'+k+'</div><div class="t">'+pre+'<span class="blank" data-a="'+w+'"></span>'+post+'</div>';
+    rows.appendChild(r);
+  });
+  shuffle(Q.map(q=>q[1])).forEach(w=>{
+    const c=document.createElement('button');c.className='chip';c.textContent=w;c.dataset.w=w;
+    c.addEventListener('pointerdown',down);bank.appendChild(c);
+  });
+  rows.querySelectorAll('.blank').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('ok'))return;
+    rows.querySelectorAll('.blank').forEach(x=>x.classList.remove('hot'));
+    selected=b;b.classList.add('hot');
+  }));
+}
+function upd(){document.getElementById('score').textContent=done+' / '+Q.length;document.getElementById('fill').style.width=(done/Q.length*100)+'%'}
+function place(chip,blank){
+  if(!blank||blank.classList.contains('ok'))return false;
+  if(blank.dataset.a===chip.dataset.w){
+    blank.textContent=chip.dataset.w;blank.classList.remove('hot','shake');blank.classList.add('ok');
+    chip.classList.add('used');done++;selected=null;upd();
+    if(done===Q.length)win();return true;
+  }
+  mistakes++;blank.classList.remove('shake');void blank.offsetWidth;blank.classList.add('shake');
+  setTimeout(()=>blank.classList.remove('shake'),450);return false;
+}
+function nextBlank(){return selected&&!selected.classList.contains('ok')?selected:[...rows.querySelectorAll('.blank:not(.ok)')][0]}
+function down(e){
+  const chip=e.currentTarget;if(chip.classList.contains('used'))return;
+  e.preventDefault();
+  const sx=e.clientX,sy=e.clientY,r=chip.getBoundingClientRect();
+  let ghost=null,moved=false;
+  function mv(ev){
+    if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<8)return;
+    if(!moved){moved=true;ghost=chip.cloneNode(true);ghost.classList.add('drag');ghost.style.width=r.width+'px';document.body.appendChild(ghost);chip.style.opacity=.3}
+    ghost.style.left=(ev.clientX-r.width/2)+'px';ghost.style.top=(ev.clientY-r.height/2)+'px';
+    rows.querySelectorAll('.blank').forEach(b=>b.classList.remove('hot'));
+    const t=document.elementFromPoint(ev.clientX,ev.clientY);const b=t&&t.closest&&t.closest('.blank');
+    if(b&&!b.classList.contains('ok'))b.classList.add('hot');
+  }
+  function up(ev){
+    window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);
+    chip.style.opacity='';
+    rows.querySelectorAll('.blank').forEach(b=>b.classList.remove('hot'));
+    if(moved){
+      if(ghost)ghost.remove();
+      const t=document.elementFromPoint(ev.clientX,ev.clientY);
+      place(chip,t&&t.closest&&t.closest('.blank'));
+    }else{
+      const b=nextBlank();if(b){place(chip,b)}
+    }
+  }
+  window.addEventListener('pointermove',mv);window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+}
+function win(){
+  document.getElementById('msg').textContent=mistakes===0?'Perfect! No mistakes!':'You finished with '+mistakes+' mistake'+(mistakes>1?'s':'')+'. Try again for a perfect score!';
+  document.getElementById('win').style.display='block';
+  document.getElementById('win').scrollIntoView({behavior:'smooth',block:'center'});confetti();
+}
+function confetti(){
+  const cv=document.getElementById('cv'),x=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
+  const cols=['#ffd43b','#3b5bdb','#1fa971','#e5484d','#f783ac'];
+  const p=Array.from({length:120},()=>({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.5,v:2+Math.random()*4,s:5+Math.random()*7,c:cols[Math.floor(Math.random()*5)],r:Math.random()*6}));
+  let f=0;(function a(){x.clearRect(0,0,cv.width,cv.height);p.forEach(q=>{q.y+=q.v;q.r+=.1;x.save();x.translate(q.x,q.y);x.rotate(q.r);x.fillStyle=q.c;x.fillRect(0,0,q.s,q.s*.6);x.restore()});if(++f<240)requestAnimationFrame(a);else x.clearRect(0,0,cv.width,cv.height)})();
+}
+document.getElementById('again').onclick=build;
+build();
+</script>
+</body>
+</html>
