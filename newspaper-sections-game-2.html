@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Newspaper Sections Game</title>
+<style>
+:root{--bg:#d6f5d0;--ink:#1d2a44;--card:#ffffff;--blank:#e8eefc;--ok:#1fa971;--bad:#e5484d;--accent:#3b5bdb;--chip:#ffd43b;--shadow:#1d2a44;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2","Trebuchet MS","Segoe UI",system-ui,sans-serif;min-height:100vh;touch-action:manipulation}
+.wrap{max-width:760px;margin:0 auto;padding:16px 14px 50px}
+h1{font-size:clamp(26px,6vw,40px);margin:6px 0 2px;text-align:center;letter-spacing:-.5px}
+.sub{text-align:center;margin:0 0 10px;font-size:17px;opacity:.85}
+.bank{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 0;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;border-bottom:3px dashed var(--ink);margin-bottom:14px}
+.cw{display:flex;align-items:center;gap:4px}
+.chip{font:inherit;font-weight:800;font-size:clamp(16px,4.4vw,20px);background:var(--chip);color:#1d2a44;border:3px solid #1d2a44;border-radius:14px;padding:8px 14px;box-shadow:0 4px 0 var(--shadow);cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.drag{position:fixed;z-index:99;pointer-events:none;transform:rotate(-4deg) scale(1.08);margin:0}
+.spk{flex:none;font-size:20px;line-height:1;width:38px;height:38px;border-radius:50%;border:3px solid var(--ink);background:#fff;cursor:pointer;display:grid;place-items:center;padding:0}
+.spk:disabled{opacity:.3;cursor:not-allowed;filter:grayscale(1)}
+.spk.on{background:#c5d4ff}
+.row{background:var(--card);border:3px solid var(--ink);border-radius:18px;padding:12px 14px;margin-bottom:14px;box-shadow:0 5px 0 var(--shadow)}
+.row.ok{border-color:var(--ok)}.row.bad{border-color:var(--bad)}
+.top{display:flex;gap:10px;align-items:center}
+.l{flex:none;width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:20px;display:grid;place-items:center}
+.t{flex:1;font-size:clamp(17px,4.6vw,22px);line-height:1.9}
+.blank{display:inline-block;min-width:130px;min-height:40px;vertical-align:middle;text-align:center;background:var(--blank);border:3px dashed var(--ink);border-radius:12px;padding:3px 10px;font-weight:800;line-height:1.5;margin:0 2px;cursor:pointer}
+.blank.hot{border-color:var(--accent);background:#dbe4ff}
+.blank.full{border-style:solid;background:var(--chip)}
+.blank.ok{border-color:var(--ok);background:var(--ok);color:#fff;cursor:default}
+.blank.bad{border-color:var(--bad);background:var(--bad);color:#fff;cursor:default}
+.fb{margin-top:10px;display:flex;gap:10px;align-items:flex-start;border-radius:14px;padding:10px 12px;font-size:17px;line-height:1.45}
+.fb.ok{background:#d3f9e4;border:2px solid var(--ok)}.fb.bad{background:#ffe0e1;border:2px solid var(--bad)}
+.fb .face{font-size:38px;line-height:1}
+.fb.bad .face{animation:sad 1.2s ease-in-out 2}
+@keyframes sad{50%{transform:translateY(5px) rotate(-8deg)}}
+.hint{text-align:center;font-size:15px;opacity:.85;margin:0 0 10px}
+.ctl{text-align:center;margin:18px 0}
+button.go{font:inherit;font-weight:800;font-size:20px;background:var(--accent);color:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px 24px;box-shadow:0 4px 0 var(--shadow);cursor:pointer;margin:4px}
+button.go:disabled{opacity:.4;cursor:not-allowed}
+#res{text-align:center;font-size:24px;font-weight:800;margin-top:6px}
+canvas{position:fixed;inset:0;pointer-events:none;z-index:200}
+@media (prefers-reduced-motion:reduce){.fb.bad .face{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📰 Newspaper Sections</h1>
+  <p class="sub">Fill each gap with the right section.</p>
+  <p class="hint">Drag a word into a gap, or tap a word. Tap a word in a gap to remove it. Press <b>Check answers</b> when all gaps are full. Then press 🔊 to listen.</p>
+  <div class="bank" id="bank"></div>
+  <div id="rows"></div>
+  <div class="ctl"><button class="go" id="check">Check answers</button><button class="go" id="again">Play again</button><div id="res"></div></div>
+</div>
+<canvas id="cv"></canvas>
+<script>
+const D={ "Cartoons":"are funny stories with small pictures","Jokes":"are short, funny stories","Poetry":"is writing with words that rhyme","Interviews":"are asking people questions about themselves","Town events":"are things happening in the town","Sports reports":"are descriptions of events, for example, football matches","School news":"are reports about school events"};
+const Q=[
+["a","Cartoons","","are funny stories with small pictures."],
+["b","Jokes","","are short, funny stories."],
+["c","Poetry","","is writing with words that rhyme."],
+["d","Interviews","","are asking people questions about themselves."],
+["e","Town events","","are things happening in the town."],
+["f","Sports reports","","are descriptions of events, for example, football matches."],
+["g","School news","","are reports about school events."]];
+const bankEl=document.getElementById('bank'),rowsEl=document.getElementById('rows'),res=document.getElementById('res');
+let order,placed,checked,selected;
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function reset(){order=shuffle(Q.map(q=>q[1]));placed=Q.map(()=>null);checked=false;selected=null;res.textContent='';speechSynthesis&&speechSynthesis.cancel();render()}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+function render(){
+  bankEl.innerHTML='';rowsEl.innerHTML='';
+  order.forEach(w=>{
+    const d=document.createElement('div');d.className='cw';
+    const c=document.createElement('button');c.className='chip'+(placed.includes(w)?' used':'');c.textContent=w;c.dataset.w=w;
+    if(!checked)c.addEventListener('pointerdown',down);
+    const s=document.createElement('button');s.className='spk';s.textContent='🔊';s.disabled=!checked;s.title=checked?'Listen':'Check your answers first';
+    s.onclick=()=>say(w);
+    d.append(c,s);bankEl.appendChild(d);
+  });
+  Q.forEach((q,i)=>{
+    const r=document.createElement('div');r.className='row';
+    const p=placed[i],good=checked&&p===q[1];
+    if(checked)r.classList.add(good?'ok':'bad');
+    const blankCls='blank'+(p?' full':'')+(checked?(good?' ok':' bad'):'')+(!checked&&selected===i?' hot':'');
+    r.innerHTML='<div class="top"><div class="l">'+q[0]+'</div><div class="t"><span class="'+blankCls+'" data-i="'+i+'">'+(p||'')+'</span> '+q[3]+'</div></div>';
+    const sp=document.createElement('button');sp.className='spk';sp.textContent='🔊';sp.disabled=!checked;sp.title=checked?'Listen':'Check your answers first';
+    sp.onclick=()=>say(q[1]+' '+q[3]);r.querySelector('.top').appendChild(sp);
+    if(checked){
+      const f=document.createElement('div');f.className='fb '+(good?'ok':'bad');
+      f.innerHTML=good?
+        '<div class="face">😄</div><div><b>Correct!</b> '+q[1]+' '+D[q[1]]+', so it fits this sentence.</div>':
+        '<div class="face">😢</div><div><b>Not correct.</b> "'+p+'" '+D[p]+'. This sentence needs <b>'+q[1]+'</b>, because '+q[1]+' '+D[q[1]]+'.</div>';
+      r.appendChild(f);
+    }
+    rowsEl.appendChild(r);
+  });
+  rowsEl.querySelectorAll('.blank').forEach(b=>b.addEventListener('click',()=>{
+    if(checked)return;const i=+b.dataset.i;
+    if(placed[i]){placed[i]=null;selected=i}else selected=i;render();upd();
+  }));
+  upd();
+}
+function upd(){
+  document.getElementById('check').disabled=checked||placed.some(x=>!x);
+  document.getElementById('check').style.display=checked?'none':'';
+}
+function put(w,i){placed[i]=w;selected=null;render()}
+function nextEmpty(){return (selected!==null&&!placed[selected])?selected:placed.findIndex(x=>!x)}
+function down(e){
+  const chip=e.currentTarget;if(chip.classList.contains('used'))return;
+  e.preventDefault();
+  const sx=e.clientX,sy=e.clientY,r=chip.getBoundingClientRect();let ghost=null,moved=false;
+  function mv(ev){
+    if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<8)return;
+    if(!moved){moved=true;ghost=chip.cloneNode(true);ghost.classList.add('drag');ghost.style.width=r.width+'px';document.body.appendChild(ghost);chip.style.opacity=.3}
+    ghost.style.left=(ev.clientX-r.width/2)+'px';ghost.style.top=(ev.clientY-r.height/2)+'px';
+    rowsEl.querySelectorAll('.blank').forEach(b=>b.classList.remove('hot'));
+    const t=document.elementFromPoint(ev.clientX,ev.clientY),b=t&&t.closest&&t.closest('.blank');
+    if(b)b.classList.add('hot');
+  }
+  function up(ev){
+    removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);
+    chip.style.opacity='';
+    if(moved){ghost&&ghost.remove();const t=document.elementFromPoint(ev.clientX,ev.clientY),b=t&&t.closest&&t.closest('.blank');
+      if(b)put(chip.dataset.w,+b.dataset.i);else render();}
+    else{const i=nextEmpty();if(i>=0)put(chip.dataset.w,i)}
+  }
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up);
+}
+document.getElementById('check').onclick=()=>{
+  if(placed.some(x=>!x))return;
+  checked=true;render();
+  const n=placed.filter((p,i)=>p===Q[i][1]).length;
+  res.textContent='Score: '+n+' / '+Q.length+(n===Q.length?' 🏆':'');
+  if(n>0)balloons(6+n*5);
+  setTimeout(()=>rowsEl.scrollIntoView({behavior:'smooth'}),100);
+};
+document.getElementById('again').onclick=reset;
+let anim=0;
+function balloons(count){
+  const cv=document.getElementById('cv'),x=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
+  const cols=['#ff4d6d','#ffd43b','#3b5bdb','#1fa971','#f783ac','#ff922b','#9775fa'];
+  const b=Array.from({length:count},()=>({x:Math.random()*cv.width,y:cv.height+40+Math.random()*cv.height*.8,v:1.5+Math.random()*2.5,r:20+Math.random()*14,c:cols[Math.floor(Math.random()*cols.length)],ph:Math.random()*6}));
+  cancelAnimationFrame(anim);let f=0;
+  (function a(){
+    x.clearRect(0,0,cv.width,cv.height);let live=false;
+    b.forEach(o=>{o.y-=o.v;const px=o.x+Math.sin(f/30+o.ph)*14;if(o.y>-80)live=true;
+      x.strokeStyle='#555';x.lineWidth=1.5;x.beginPath();x.moveTo(px,o.y+o.r*1.25);x.quadraticCurveTo(px+8,o.y+o.r*2,px,o.y+o.r*2.8);x.stroke();
+      x.fillStyle=o.c;x.beginPath();x.ellipse(px,o.y,o.r,o.r*1.25,0,0,7);x.fill();
+      x.fillStyle='rgba(255,255,255,.45)';x.beginPath();x.ellipse(px-o.r*.35,o.y-o.r*.4,o.r*.2,o.r*.35,.5,0,7);x.fill();
+      x.fillStyle=o.c;x.beginPath();x.moveTo(px,o.y+o.r*1.2);x.lineTo(px-4,o.y+o.r*1.4);x.lineTo(px+4,o.y+o.r*1.4);x.fill()});
+    f++;if(live&&f<900)anim=requestAnimationFrame(a);else x.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+reset();
+</script>
+</body>
+</html>
