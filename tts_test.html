@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TTS Test</title>
+<style>
+body{font-family:system-ui,sans-serif;padding:20px;background:#f0f4ff;color:#111}
+button{font-size:1.1rem;padding:14px 20px;border-radius:10px;border:0;background:#2f6fed;color:#fff;margin:8px 0;display:block;width:100%}
+#log{white-space:pre-wrap;background:#fff;border:1px solid #ccc;border-radius:10px;padding:12px;margin-top:14px;font-size:.85rem;line-height:1.5}
+</style>
+</head>
+<body>
+<h2>🔊 Speech Test Page</h2>
+<button id="b1">1. Tap to speak "Hello"</button>
+<button id="b2">2. List available voices</button>
+<div id="log">Log will appear here...</div>
+<script>
+var log = document.getElementById("log");
+function print(t){ log.textContent += "\n" + t; }
+
+print("speechSynthesis supported: " + (typeof window.speechSynthesis !== "undefined"));
+
+document.getElementById("b1").onclick = function(){
+  log.textContent = "Trying to speak...";
+  try {
+    var u = new SpeechSynthesisUtterance("Hello, can you hear me?");
+    u.lang = "en-US";
+    u.onstart = function(){ print("✅ onstart fired - speech began"); };
+    u.onend = function(){ print("✅ onend fired - speech finished normally"); };
+    u.onerror = function(e){ print("❌ onerror: " + e.error); };
+    speechSynthesis.speak(u);
+    print("speak() called, speaking=" + speechSynthesis.speaking + ", pending=" + speechSynthesis.pending);
+  } catch(e) {
+    print("❌ Exception: " + e.message);
+  }
+};
+
+document.getElementById("b2").onclick = function(){
+  var v = speechSynthesis.getVoices();
+  log.textContent = "Found " + v.length + " voice(s):";
+  v.forEach(function(x){ print("- " + x.name + " (" + x.lang + ") default=" + x.default); });
+  if (v.length === 0) print("No voices loaded yet — try tapping this button again in a second.");
+};
+</script>
+</body>
+</html>
