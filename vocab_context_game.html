@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vocabulary in Context — Game</title>
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#e3f7e3;--bg2:#d4f3d6;--fg:#000;--card:#ffffff;--bd:#bfe8c2;
+  --accent:#2e9e4f;--accent-d:#1f7a3a;--wrong:#e2473f;--wrong-bg:#ffe3e1;--right-bg:#dff7e3;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);color:#000;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;padding:18px 14px 40px}
+.teacher{text-align:center;font-weight:800;color:var(--accent-d);font-size:1rem;margin-bottom:4px}
+h1{text-align:center;font-size:1.4rem;margin:4px 0 2px;color:var(--accent-d)}
+.sub{text-align:center;font-size:.9rem;opacity:.8;margin:0 0 14px;color:#000}
+.wordbank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;background:var(--card);border:2px dashed var(--accent);border-radius:16px;padding:14px;margin:0 auto 20px;max-width:560px}
+.chip{background:#fff7cc;color:#000;border:2px solid #e8cf4a;border-radius:12px;padding:9px 14px;font-weight:700;font-size:1rem;cursor:pointer;user-select:none;touch-action:none;box-shadow:0 2px 0 rgba(0,0,0,.08);transition:transform .15s,opacity .15s}
+.chip.selected{outline:3px solid var(--accent);transform:translateY(-2px)}
+.chip.used{display:none}
+.row{display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:10px auto 2px;max-width:560px}
+.letter{width:30px;height:30px;min-width:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:.95rem;margin-top:2px}
+.sent{flex:1;font-size:.97rem;line-height:1.5;color:#000}
+.blank{display:inline-flex;min-width:100px;height:34px;border:2px dashed #9dbfa3;border-radius:8px;background:#f3fbf3;color:#000;align-items:center;justify-content:center;font-weight:800;padding:0 8px;margin:0 3px;vertical-align:middle;transition:background .2s,border-color .2s}
+.blank.filled{border-style:solid}
+.blank.correct{background:var(--right-bg);border-color:var(--accent)}
+.blank.incorrect{background:var(--wrong-bg);border-color:var(--wrong)}
+.below{max-width:560px;margin:0 auto 6px;min-height:1.2em;font-size:.85rem;padding:0 4px;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.below .msg{font-weight:700}
+.below.ok .msg{color:var(--accent-d)}
+.below.bad .msg{color:var(--wrong)}
+.spkwrap{display:none;align-items:center;gap:6px;margin-top:2px}
+.below.ok .spkwrap{display:flex}
+.spk{background:var(--accent);border:none;border-radius:8px;cursor:pointer;font-size:1rem;color:#fff;padding:5px 10px;flex-shrink:0}
+.hint{font-size:.76rem;color:var(--accent-d);font-weight:700}
+.emoji{font-size:1.1rem;vertical-align:middle}
+.footer{text-align:center;margin-top:24px;font-weight:800;color:var(--accent-d)}
+.reset{display:block;margin:22px auto 0;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:10px 22px;font-size:1rem;font-weight:700;cursor:pointer}
+.progress{text-align:center;font-weight:700;color:var(--accent-d);margin-top:10px}
+.scorebox{max-width:420px;margin:18px auto 0;background:var(--card);border:2px solid var(--accent);border-radius:16px;padding:16px;text-align:center;display:none;color:#000}
+.scorebox h2{margin:0 0 8px;color:var(--accent-d)}
+.confetti{position:fixed;top:0;left:0;width:10px;height:10px;border-radius:2px;pointer-events:none;z-index:999;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(100vh) rotate(540deg);opacity:.2}}
+</style>
+</head>
+<body>
+<div class="teacher">👩‍🏫 Teacher: Dhuha Karim</div>
+<h1>📘 Vocabulary in Context</h1>
+<p class="sub">Tap a word, then tap the blank where it fits.</p>
+
+<div class="wordbank" id="bank"></div>
+<div id="rows"></div>
+
+<div class="progress" id="progress"></div>
+<div class="scorebox" id="scorebox"></div>
+<button class="reset" id="resetBtn">🔄 Try Again</button>
+<div class="footer">👩‍🏫 Teacher: Dhuha Karim</div>
+
+<script>
+var items = [
+  {l:"a", before:"Our teacher told us a ", after:" this morning, and we all laughed loudly.", ans:"joke",
+   right:"A joke is a short, funny story that makes people laugh.",
+   wrong:"Think about something short and funny that made everyone laugh."},
+  {l:"b", before:"Noora has written an ", after:" for the school magazine.", ans:"article",
+   right:"An article is a piece of writing for a magazine or newspaper.",
+   wrong:"Think about a piece of writing you'd find in a school magazine."},
+  {l:"c", before:"Our football ", after:" didn't play well in the match yesterday.", ans:"team",
+   right:"A team is a group of players who play together.",
+   wrong:"Think about a group of players, not just one person."},
+  {l:"d", before:"We need to interview a ", after:" person in our town. Can you suggest someone?", ans:"well-known",
+   right:"Well-known describes a person that many people recognise.",
+   wrong:"Think about a word that describes someone many people know."},
+  {l:"e", before:"I don't like writing stories, but I love writing ", after:".", ans:"poetry",
+   right:"Poetry is writing with rhyme and rhythm, like a poem.",
+   wrong:"Think about a type of writing with rhyme, different from stories."}
+];
+
+var praises = ["Well done!","Great job!","Excellent!","Fantastic!","Brilliant!"];
+
+var words = items.map(function(it){return it.ans;});
+for (var i = words.length - 1; i > 0; i--) {
+  var j = Math.floor(Math.random() * (i + 1));
+  var t = words[i]; words[i] = words[j]; words[j] = t;
+}
+
+var cachedVoices = [];
+function loadVoices(){ try{ cachedVoices = speechSynthesis.getVoices()||[]; }catch(e){ cachedVoices=[]; } }
+if (typeof speechSynthesis !== "undefined"){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function pickVoice(){
+  var gb = cachedVoices.filter(function(v){return v.lang.replace("_","-")==="en-GB";});
+  if (gb.length) return gb[0];
+  var en = cachedVoices.filter(function(v){return v.lang.indexOf("en")===0;});
+  return en.length ? en[0] : null;
+}
+var unlocked = false;
+function unlockAudio(){
+  if (unlocked || typeof speechSynthesis==="undefined") return;
+  unlocked = true;
+  try{ var u=new SpeechSynthesisUtterance(" "); u.volume=0; speechSynthesis.speak(u); }catch(e){}
+}
+document.body.addEventListener("touchstart", unlockAudio, {once:true, passive:true});
+document.body.addEventListener("click", unlockAudio, {once:true});
+
+function say(t, attempt){
+  if (typeof speechSynthesis === "undefined") return;
+  attempt = attempt || 0;
+  loadVoices();
+  if (!cachedVoices.length && attempt < 6){
+    setTimeout(function(){ say(t, attempt+1); }, 200);
+    return;
+  }
+  try{
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(t);
+    u.lang="en-GB"; u.rate=.72;
+    var v=pickVoice(); if(v) u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+var actx=null;
+function chime(){
+  try{
+    if (!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
+    var notes=[523.25,659.25,783.99];
+    notes.forEach(function(freq,idx){
+      var o=actx.createOscillator(), g=actx.createGain();
+      o.type="sine"; o.frequency.value=freq;
+      var start=actx.currentTime+idx*0.09;
+      g.gain.setValueAtTime(0.0001,start);
+      g.gain.exponentialRampToValueAtTime(0.18,start+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,start+0.35);
+      o.connect(g); g.connect(actx.destination);
+      o.start(start); o.stop(start+0.4);
+    });
+  }catch(e){}
+}
+
+var bank=document.getElementById("bank");
+var rowsEl=document.getElementById("rows");
+var progressEl=document.getElementById("progress");
+var scorebox=document.getElementById("scorebox");
+var selectedChip=null, solvedCount=0, mistakeCount=0;
+
+function makeChip(word){
+  var chip=document.createElement("div");
+  chip.className="chip"; chip.dataset.word=word; chip.textContent=word;
+  chip.addEventListener("click", function(){
+    if (selectedChip===chip){ chip.classList.remove("selected"); selectedChip=null; return; }
+    if (selectedChip) selectedChip.classList.remove("selected");
+    selectedChip=chip; chip.classList.add("selected");
+  });
+  return chip;
+}
+words.forEach(function(w){ bank.appendChild(makeChip(w)); });
+
+function updateProgress(){ progressEl.textContent = solvedCount + " / " + items.length + " ✅"; }
+updateProgress();
+
+function burstConfetti(x,y){
+  var colors=["#ff6b6b","#ffd93d","#6bcB77","#4d96ff","#c77dff","#ff9f1c"];
+  for (var i=0;i<24;i++){
+    var c=document.createElement("div");
+    c.className="confetti"; c.style.left=x+"px"; c.style.top=y+"px";
+    c.style.background=colors[i%colors.length];
+    var dur=900+Math.random()*700; c.style.animationDuration=dur+"ms";
+    c.style.transform="translateX("+((Math.random()-0.5)*160)+"px)";
+    document.body.appendChild(c);
+    setTimeout(function(el){return function(){el.remove();};}(c), dur+50);
+  }
+}
+
+function showFinalScore(){
+  var total=items.length, tier, emoji;
+  if (mistakeCount===0){ tier="Excellent!"; emoji="🌟"; }
+  else if (mistakeCount<=2){ tier="Great job!"; emoji="👍"; }
+  else { tier="Keep practicing!"; emoji="💪"; }
+  scorebox.style.display="block";
+  scorebox.innerHTML =
+    "<h2>🏆 Results</h2>"+
+    "<div>Correct: "+total+" / "+total+"</div>"+
+    "<div>Mistakes: "+mistakeCount+"</div>"+
+    "<div style='margin-top:8px;font-size:1.1rem;font-weight:800;color:var(--accent-d)'>"+emoji+" "+tier+"</div>";
+}
+
+function placeWord(word, chip, blank, item, belowEl){
+  var correct=(word===item.ans);
+  blank.classList.add("filled"); blank.textContent=word;
+  if (correct){
+    blank.classList.add("correct"); blank.classList.remove("incorrect");
+    var praise = praises[Math.floor(Math.random()*praises.length)];
+    belowEl.className="below ok";
+    belowEl.innerHTML =
+      '<span class="msg"><span class="emoji">🎉</span> '+praise+' '+item.right+'</span>'+
+      '<span class="spkwrap"><button class="spk">🔊</button><span class="hint">إن أردت سماع النطق اضغط على الأيقونة</span></span>';
+    belowEl.querySelector(".spk").onclick=function(){ say(item.before+item.ans+item.after); };
+    chip.classList.add("used");
+    var rect=blank.getBoundingClientRect();
+    burstConfetti(rect.left+rect.width/2, rect.top+window.scrollY);
+    chime();
+    solvedCount++; updateProgress();
+    if (solvedCount===items.length) setTimeout(showFinalScore, 400);
+  } else {
+    blank.classList.add("incorrect"); blank.classList.remove("correct");
+    belowEl.className="below bad";
+    belowEl.innerHTML = '<span class="msg"><span class="emoji">😞</span> Not quite. '+item.wrong+'</span>';
+    mistakeCount++;
+    setTimeout(function(){
+      blank.classList.remove("filled","incorrect"); blank.textContent="";
+      belowEl.className="below"; belowEl.innerHTML="";
+    }, 2000);
+  }
+}
+
+items.forEach(function(item){
+  var row=document.createElement("div"); row.className="row";
+  var letter=document.createElement("div"); letter.className="letter"; letter.textContent=item.l;
+  var sent=document.createElement("div"); sent.className="sent";
+  sent.appendChild(document.createTextNode(item.before));
+  var blank=document.createElement("span"); blank.className="blank";
+  sent.appendChild(blank);
+  sent.appendChild(document.createTextNode(item.after));
+  row.appendChild(letter); row.appendChild(sent);
+  rowsEl.appendChild(row);
+
+  var belowEl=document.createElement("div"); belowEl.className="below";
+  rowsEl.appendChild(belowEl);
+
+  blank.addEventListener("click", function(){
+    if (blank.classList.contains("correct")) return;
+    if (!selectedChip) return;
+    var word=selectedChip.dataset.word, chip=selectedChip;
+    selectedChip.classList.remove("selected"); selectedChip=null;
+    placeWord(word, chip, blank, item, belowEl);
+  });
+});
+
+document.getElementById("resetBtn").onclick=function(){ location.reload(); };
+</script>
+</body>
+</html>
