@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unit 1 – Lesson 2: A New Project | Drag & Drop</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:#000;background:linear-gradient(135deg,#ffd6e8,#d6ecff 40%,#d9ffe6 70%,#fff3c4);background-attachment:fixed;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:14px}
+header,footer{text-align:center;background:rgba(255,255,255,.88);border-radius:20px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,.12);color:#000}
+h1{margin:0;font-size:22px}h2{margin:4px 0;font-size:16px;font-weight:600}
+.by{display:inline-block;margin-top:6px;background:#ffe36e;border-radius:99px;padding:5px 18px;font-weight:700}
+.hint{text-align:center;font-weight:600;margin:10px 0 0}
+.bank{position:sticky;top:0;z-index:5;margin:12px 0;background:rgba(255,255,255,.96);border-radius:16px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.chip{background:#fff;border:2px solid #7c5cff;color:#000;border-radius:12px;padding:8px 12px;font-size:16px;font-weight:700;cursor:grab;user-select:none;touch-action:manipulation}
+.chip.sel{background:#ffe36e;transform:scale(1.07)}.chip.used{opacity:.25;pointer-events:none}
+.card{background:#fff;color:#000;border-radius:18px;padding:14px;margin:12px 0;box-shadow:0 4px 12px rgba(0,0,0,.12);border:3px solid transparent;position:relative}
+.card.ok{background:#d8ffe0;border-color:#22b04b}.card.bad{background:#ffdede;border-color:#e03131}
+.en{direction:ltr;text-align:left;font-size:18px;line-height:2.3;color:#000}
+.ar{font-size:15px;margin-top:4px;color:#000}
+.blank{display:inline-block;min-width:150px;min-height:36px;vertical-align:middle;border:3px dashed #7c5cff;border-radius:10px;background:#f3efff;text-align:center;line-height:30px;font-weight:700;color:#000;padding:0 6px}
+.blank.over{background:#ffe36e}
+.ok .blank{border:3px solid #22b04b;background:#b6f5c3}.bad .blank{border:3px solid #e03131;background:#ffb9b9}
+.fb{display:none;margin-top:8px;font-size:15px;line-height:1.8;color:#000}.done .fb{display:block}
+.big{font-size:22px;font-weight:800}
+.spk{display:none;border:0;background:#4c6fff;color:#fff;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;vertical-align:middle;margin-inline-start:6px}
+.done .spk{display:inline-block}
+.num{position:absolute;top:8px;inset-inline-end:12px;font-weight:800;opacity:.5}
+#res{text-align:center;background:#fff;border-radius:18px;padding:16px;font-size:20px;font-weight:800;color:#000;margin-top:14px}
+button.re{margin-top:8px;border:0;background:#22b04b;color:#fff;font-size:16px;font-weight:700;padding:10px 22px;border-radius:12px;cursor:pointer}
+footer{margin-top:14px}
+.conf{position:fixed;top:-30px;font-size:26px;z-index:99;pointer-events:none;animation:fall 2.4s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>🎯 Unit 1 – Lesson 2: A New Project</h1>
+<h2>لعبة الإسقاط: اسحب الكلمة إلى الجملة المناسبة</h2>
+<div class="by">✏️ إعداد الأستاذة: Dhuha Karim</div>
+</header>
+<p class="hint">اضغط على الكلمة ثم اضغط على الفراغ، أو اسحبها إليه 👇</p>
+<p style="text-align:center;margin:6px 0"><button class="re" onclick="say('Hello! Welcome to Lesson Two, A New Project.')">🔊 تجربة الصوت</button></p>
+<div class="bank" id="bank"></div>
+<div id="list"></div>
+<div id="res"></div>
+<footer>🌟 مع تمنياتي لكم بالتوفيق<br><b>الأستاذة: Dhuha Karim</b></footer>
+</div>
+<script>
+var D=[
+{w:"article",s:"Article, noun.",d:"a piece of writing in a newspaper or magazine",t:"مقال",a:"مقال في صحيفة أو مجلة",r:"كلمة article اسم (n.) تعني مقال، وهي قطعة كتابة تُنشر في صحيفة أو مجلة."},
+{w:"cover",s:"Cover, noun.",d:"the outside of a book or magazine",t:"غلاف",a:"غلاف كتاب أو مجلة",r:"كلمة cover اسم (n.) تعني الغلاف، أي الجزء الخارجي من الكتاب أو المجلة."},
+{w:"edit",s:"Edit, verb.",d:"to check and correct a piece of writing",t:"يراجع ويصحح",a:"يراجع ويصحح الكتابة",r:"كلمة edit فعل (v.) يعني يراجع ويصحح، فهي تدل على عمل المراجعة والتصحيح."},
+{w:"editor",s:"Editor, noun.",d:"somebody who edits",t:"محرر",a:"شخص يقوم بالتحرير",r:"كلمة editor اسم (n.) من الفعل edit، وتعني الشخص الذي يقوم بالتحرير."},
+{w:"print",s:"Print, verb.",d:"to put words or pictures on paper with a machine",t:"يطبع",a:"يطبع كلمات أو صورًا على الورق",r:"كلمة print فعل (v.) يعني يطبع، أي ينقل الكلمات أو الصور على الورق بآلة."},
+{w:"printer",s:"Printer, noun.",d:"1. somebody who prints as a job. 2. a machine that prints",t:"طابعة / شخص يطبع",a:"1. شخص يطبع (يعمل في الطباعة). 2. آلة الطباعة",r:"كلمة printer اسم (n.) من الفعل print، ولها معنيان: شخص يطبع كوظيفة، وآلة تطبع."},
+{w:"report",s:"Report, verb.",d:"to describe an event",t:"يصف حدثًا",a:"يصف حدثًا",r:"كلمة report فعل (v.) يعني يصف حدثًا أو يخبر عنه."},
+{w:"report",s:"Report, noun.",d:"a news report about an event",t:"تقرير",a:"تقرير إخباري عن حدث",r:"كلمة report اسم (n.) تعني تقرير، وهي مشتقة من الفعل report."},
+{w:"reporter",s:"Reporter, noun.",d:"a person who reports",t:"مراسل",a:"شخص يكتب التقارير (مراسل)",r:"كلمة reporter اسم (n.) من الفعل report، وتعني الشخص الذي يعد التقارير (مراسل)."}
+];
+var sel=null,score=0,answered=0,R=[],voice=null;
+function pick(){if(!window.speechSynthesis)return;var v=speechSynthesis.getVoices();voice=v.find(function(x){return x.lang.replace("_","-")==="en-GB"})||v.find(function(x){return /British|UK/i.test(x.name)})||v.find(function(x){return /^en/i.test(x.lang)})||null}
+if(window.speechSynthesis){pick();speechSynthesis.onvoiceschanged=pick}
+function tts(t){if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return;pick();speechSynthesis.cancel();setTimeout(function(){var u=new SpeechSynthesisUtterance(t);u.lang="en-GB";if(voice)u.voice=voice;u.rate=.8;speechSynthesis.speak(u);speechSynthesis.resume()},120)}
+function say(t){var d=false;function fb(){if(d)return;d=true;tts(t)}try{if(window.__a)window.__a.pause();if(window.speechSynthesis)speechSynthesis.cancel();var a=new Audio("https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-GB&q="+encodeURIComponent(t));window.__a=a;a.playbackRate=.9;a.onerror=fb;var p=a.play();if(p&&p.catch)p.catch(fb)}catch(e){fb()}}
+function full(i){var x=D[i];return x.s+" "+x.d.charAt(0).toUpperCase()+x.d.slice(1)+"."}
+function confetti(){var e=["🎉","🎊","✨","⭐","🎈","🌸"];for(var i=0;i<30;i++){var s=document.createElement("span");s.className="conf";s.textContent=e[i%e.length];s.style.left=Math.random()*100+"vw";s.style.animationDelay=Math.random()*.6+"s";document.body.appendChild(s);setTimeout(function(x){x.remove()}.bind(null,s),3400)}}
+function evalHtml(){var n=D.length,p=Math.round(score/n*100),st=p>=90?5:p>=75?4:p>=55?3:p>=35?2:1,s="";for(var j=0;j<5;j++)s+=j<st?"⭐":"☆";var g=p>=90?"🏆 ممتاز — Excellent!":p>=75?"👏 جيد جداً — Very good!":p>=55?"🙂 جيد — Good!":"💪 حاول مرة أخرى — Try again!";var li=D.map(function(x,i){return '<div style="text-align:right;font-size:15px;font-weight:600">'+(i+1)+'. '+x.w+' '+(R[i]?'✅':'❌')+'</div>'}).join("");return '<div style="font-size:24px">📊 التقييم النهائي</div><div style="font-size:30px;margin:6px 0">'+s+'</div><div>'+g+'</div><div>الدرجة: '+score+' / '+n+' ('+p+'%)</div><div style="margin:8px 0">'+li+'</div><div style="font-size:16px">الأستاذة: Dhuha Karim 🌷</div>'}
+function build(){
+sel=null;score=0;answered=0;R=[];document.getElementById("res").innerHTML="📊 التقييم النهائي سيظهر هنا بعد حل جميع الجمل";
+var b=document.getElementById("bank"),l=document.getElementById("list");b.innerHTML="";l.innerHTML="";
+D.map(function(x,i){return i}).sort(function(){return Math.random()-.5}).forEach(function(i){
+var c=document.createElement("div");c.className="chip";c.textContent=D[i].w;c.draggable=true;c.dataset.i=i;
+c.onclick=function(){if(sel)sel.classList.remove("sel");sel=c;c.classList.add("sel")};
+c.ondragstart=function(e){e.dataTransfer.setData("text",i);if(sel)sel.classList.remove("sel");sel=c};
+b.appendChild(c)});
+D.forEach(function(x,i){
+var d=document.createElement("div");d.className="card";d.id="c"+i;
+d.innerHTML='<span class="num">'+(i+1)+'</span><div class="en"><span class="blank" id="b'+i+'">&nbsp;</span> : '+x.d+'. <button class="spk" aria-label="listen">🔊</button></div><div class="fb" id="f'+i+'"></div>';
+l.appendChild(d);
+var bl=d.querySelector(".blank");
+bl.onclick=function(){if(sel)place(i,+sel.dataset.i)};
+bl.ondragover=function(e){e.preventDefault();bl.classList.add("over")};
+bl.ondragleave=function(){bl.classList.remove("over")};
+bl.ondrop=function(e){e.preventDefault();bl.classList.remove("over");var k=e.dataTransfer.getData("text");if(k!=="")place(i,+k)};
+d.querySelector(".spk").onclick=function(){say(d.classList.contains("done")?full(i):x.d)}
+})}
+function place(i,k){
+var c=document.getElementById("c"+i);if(c.classList.contains("done"))return;
+var chip=document.querySelector('.chip[data-i="'+k+'"]');if(!chip||chip.classList.contains("used"))return;
+chip.classList.remove("sel");chip.classList.add("used");sel=null;
+var bl=document.getElementById("b"+i),f=document.getElementById("f"+i),x=D[i];
+bl.textContent=D[k].w;c.classList.add("done");answered++;var ok=(D[k].w===D[i].w);R[i]=ok;
+if(ok){score++;c.classList.add("ok");
+f.innerHTML='<div class="big">🎉 احسنت! Well done ✅</div><div><b>الترجمة:</b> '+x.t+' — '+x.a+'</div><div><b>سبب الحل:</b> '+x.r+'</div><div>🔊 اضغط على السماعة لسماع الجملة كاملة.</div>';
+confetti()}
+else{c.classList.add("bad");
+f.innerHTML='<div class="big">😞 إجابة خاطئة ❌</div><div>اخترتِ: <b>'+D[k].w+'</b> ومعناها «'+D[k].t+'» وهي لا تناسب هذا التعريف.</div><div>✔️ الحل الصحيح: <b>'+x.w+'</b> ('+x.t+')</div><div><b>الترجمة:</b> '+x.a+'</div><div><b>سبب الحل:</b> '+x.r+'</div><div>🔊 اضغط على السماعة لسماع الجملة كاملة.</div>';
+bl.innerHTML=D[k].w+'<br><small>✔ '+x.w+'</small>';bl.style.lineHeight="22px"}
+say(full(i));
+if(answered===D.length){var r=document.getElementById("res");
+r.innerHTML=evalHtml()+'<br><button class="re" onclick="build();window.scrollTo(0,0)">🔄 إعادة اللعبة</button>';
+r.scrollIntoView({behavior:"smooth"});if(score>=Math.ceil(D.length*.7))confetti()}}
+build();
+</script>
+</body>
+</html>
