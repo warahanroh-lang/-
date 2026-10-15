@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لعبة الاقتراحات – Suggestions Quiz</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--tx:#1b2430;--mut:#5b6877;--bd:#d9e1ec;--pr:#3b6df0;--ok:#1f9d55;--okbg:#e3f6ea;--no:#d63a3a;--nobg:#fde8e8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151d;--card:#1a212c;--tx:#eef2f7;--mut:#a3afbf;--bd:#2c3644;--pr:#6b92ff;--ok:#4cd387;--okbg:#14341f;--no:#ff7070;--nobg:#3b1818}}
+:root[data-theme="dark"]{--bg:#10151d;--card:#1a212c;--tx:#eef2f7;--mut:#a3afbf;--bd:#2c3644;--pr:#6b92ff;--ok:#4cd387;--okbg:#14341f;--no:#ff7070;--nobg:#3b1818}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.6}
+.wrap{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:4px 0;text-align:center}
+.sub{text-align:center;color:var(--mut);font-size:14px;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:12px}
+.bar{height:8px;background:var(--bd);border-radius:8px;overflow:hidden;margin:6px 0 12px}
+.bar i{display:block;height:100%;width:0;background:var(--pr);transition:width .4s}
+.meta{display:flex;justify-content:space-between;font-size:14px;color:var(--mut)}
+.q{display:flex;gap:10px;align-items:flex-start;direction:ltr;text-align:left;font-size:20px;font-weight:600}
+.num{background:var(--pr);color:#fff;border-radius:50%;min-width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.spk{border:1px solid var(--bd);background:var(--card);color:var(--pr);border-radius:50%;width:38px;height:38px;min-width:38px;font-size:18px;cursor:pointer}
+.blank{display:inline-block;min-width:70px;border-bottom:3px solid var(--pr);text-align:center}
+.opts{display:grid;gap:10px;margin-top:14px;direction:ltr}
+.opt{font-size:18px;text-align:left;padding:12px 14px;border-radius:12px;border:2px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--okbg);color:var(--ok);font-weight:700}
+.opt.no{border-color:var(--no);background:var(--nobg);color:var(--no);font-weight:700;animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{display:none;border-radius:14px;padding:14px;margin-top:12px;font-size:16px}
+.fb.ok{display:block;background:var(--okbg);color:var(--ok);border:2px solid var(--ok)}
+.fb.no{display:block;background:var(--nobg);color:var(--no);border:2px solid var(--no)}
+.fb b.t{display:block;font-size:20px;margin-bottom:4px}
+.fb p{margin:4px 0;color:var(--tx)}
+.btn{width:100%;margin-top:12px;padding:14px;font-size:17px;border:0;border-radius:12px;background:var(--pr);color:#fff;cursor:pointer;font-weight:700}
+.center{text-align:center}
+.stars{font-size:38px;letter-spacing:4px}
+.big{font-size:44px;font-weight:800;color:var(--pr)}
+.by{text-align:center;color:var(--mut);font-size:14px;margin:14px 0 4px}
+.by b{color:var(--tx)}
+#cv{position:fixed;inset:0;pointer-events:none;z-index:50;width:100%;height:100%}
+.hide{display:none}
+.inp{width:100%;padding:12px;font-size:17px;border:2px solid var(--bd);border-radius:12px;background:var(--card);color:var(--tx);margin-top:8px}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="wrap">
+  <h1>💡 لعبة الاقتراحات</h1>
+  <div class="sub">Suggestions: Let's / Shall we / Why don't we</div>
+
+  <div id="start" class="card center">
+    <p style="font-size:18px;margin-top:0">اختر الإجابة الصحيحة. اضغط 🔊 لسماع الجملة بالصوت البريطاني.</p>
+    <input id="sname" class="inp" placeholder="اكتب اسمك (اختياري)" maxlength="30">
+    <button class="btn" id="go">ابدأ اللعبة 🚀</button>
+  </div>
+
+  <div id="game" class="hide">
+    <div class="card">
+      <div class="meta"><span id="cnt"></span><span id="sc"></span></div>
+      <div class="bar"><i id="pb"></i></div>
+      <div class="q"><span class="num" id="qn"></span><span id="qt" style="flex:1"></span><button class="spk" id="spk" aria-label="listen">🔊</button></div>
+      <div class="opts" id="opts"></div>
+      <div class="fb" id="fb"></div>
+      <button class="btn hide" id="next">التالي ➜</button>
+    </div>
+  </div>
+
+  <div id="end" class="card center hide">
+    <div id="ename" style="font-weight:700"></div>
+    <div class="stars" id="stars"></div>
+    <div class="big" id="final"></div>
+    <p id="msg" style="font-size:18px"></p>
+    <button class="btn" id="again">🔄 العب مرة أخرى</button>
+  </div>
+
+  <div class="by">إعداد الأستاذة: <b id="teacher" dir="ltr">Dhuha Karim</b></div>
+</div>
+
+<script>
+// ← غيّر اسمك هنا
+const TEACHER_NAME = "Dhuha Karim";
+document.getElementById('teacher').textContent = TEACHER_NAME;
+
+const ING = s => `لا نضيف (ing) بعد ${s}، بل نستخدم الفعل المجرد (base form).`;
+const PST = s => `لا نستخدم الفعل في الماضي بعد ${s}، بل الفعل المجرد (base form).`;
+const Q = [
+ {t:"Why don't we ___ a magazine?",o:["starting","start","started"],a:1,
+  why:"بعد Why don't we نستخدم الفعل المجرد بدون أي إضافة.",bad:[ING("Why don't we"),"",PST("Why don't we")],full:"Why don't we start a magazine?"},
+ {t:"Why don't we ___ to the park this afternoon?",o:["go","going","went"],a:0,
+  why:"بعد Why don't we نستخدم الفعل المجرد (go).",bad:["",ING("Why don't we"),PST("Why don't we")],full:"Why don't we go to the park this afternoon?"},
+ {t:"What sections shall we ___ in our magazine?",o:["having","had","have"],a:2,
+  why:"بعد shall we نستخدم الفعل المجرد (have) بدون إضافة.",bad:[ING("shall we"),PST("shall we"),""],full:"What sections shall we have in our magazine?"},
+ {t:"Shall we ___ some English grammar together?",o:["study","studying","studied"],a:0,
+  why:"بعد Shall we نستخدم الفعل المجرد (study).",bad:["",ING("Shall we"),PST("Shall we")],full:"Shall we study some English grammar together?"},
+ {t:"Let's ___ articles about the school.",o:["have","having","had"],a:0,
+  why:"بعد Let's نستخدم الفعل المجرد (have).",bad:["",ING("Let's"),PST("Let's")],full:"Let's have articles about the school."},
+ {t:"Let's ___ our teacher for help.",o:["asked","ask","asking"],a:1,
+  why:"بعد Let's نستخدم الفعل المجرد (ask).",bad:[PST("Let's"),"",ING("Let's")],full:"Let's ask our teacher for help."},
+ {t:"___ watch a movie tonight?",o:["Let's","Why don't we","Shall"],a:1,
+  why:"الجملة سؤال (؟) وتبدأ بـ Why don't we لتقديم اقتراح.",
+  bad:["Let's لا تُستخدم في صيغة السؤال، بل في الجملة الخبرية مثل: Let's watch a movie.","","Shall وحدها ناقصة، الصيغة الصحيحة Shall we ."],full:"Why don't we watch a movie tonight?"},
+ {t:"___ clean the kitchen now.",o:["Shall we","Let's","Why don't"],a:1,
+  why:"الجملة خبرية تنتهي بنقطة، و Let's تناسب الاقتراح بدون سؤال.",
+  bad:["Shall we تُستخدم في الأسئلة وتنتهي بعلامة استفهام (؟).","","Why don't ناقصة، الصيغة الصحيحة Why don't we وتأتي في سؤال."],full:"Let's clean the kitchen now."},
+ {t:"___ start working on the project?",o:["Shall we","Let's","Why don't"],a:0,
+  why:"الجملة سؤال (؟)، و Shall we تُستخدم لسؤال الاقتراح.",
+  bad:["","Let's لا تأتي في جملة سؤال، تأتي في جملة خبرية.","Why don't ناقصة، تحتاج we بعدها: Why don't we ."],full:"Shall we start working on the project?"},
+ {t:"___ go for a walk in the park.",o:["Why don't we","Shall we","Let's"],a:2,
+  why:"الجملة خبرية تنتهي بنقطة، و Let's تناسبها.",
+  bad:["Why don't we تُستخدم في جملة سؤال (؟).","Shall we تُستخدم في جملة سؤال (؟).",""],full:"Let's go for a walk in the park."}
+];
+const $=id=>document.getElementById(id);
+let i=0,score=0,done=false,voice=null,pname="";
+
+/* ---------- Speech (British) ---------- */
+function pickVoice(){
+  const v=speechSynthesis.getVoices();
+  voice=v.find(x=>/en-GB/i.test(x.lang)&&/(daniel|serena|kate|google uk|male|female)/i.test(x.name))||v.find(x=>/en[-_]GB/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null;
+}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+function say(text){
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-GB';u.rate=0.8;u.pitch=1;
+  if(voice)u.voice=voice;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- Sounds ---------- */
+let ac;
+function ctx(){ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();return ac;}
+function alarm(){ // wavy siren
+  try{
+    const c=ctx(),o=c.createOscillator(),g=c.createGain(),l=c.createOscillator(),lg=c.createGain();
+    o.type='square';o.frequency.value=500;
+    l.frequency.value=3;lg.gain.value=250;l.connect(lg);lg.connect(o.frequency);
+    g.gain.setValueAtTime(0.0001,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.25,c.currentTime+0.05);
+    g.gain.setValueAtTime(0.25,c.currentTime+1.5);g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+1.7);
+    o.connect(g);g.connect(c.destination);
+    o.start();l.start();o.stop(c.currentTime+1.75);l.stop(c.currentTime+1.75);
+  }catch(e){}
+}
+function ding(){
+  try{
+    const c=ctx();[660,880,1320].forEach((f,k)=>{
+      const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=f;
+      const t=c.currentTime+k*0.12;
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.2,t+0.03);g.gain.exponentialRampToValueAtTime(0.0001,t+0.35);
+      o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+0.4);
+    });
+  }catch(e){}
+}
+
+/* ---------- Confetti / balloons ---------- */
+const cv=$('cv'),cx=cv.getContext('2d');let parts=[],raf=0;
+function size(){cv.width=innerWidth;cv.height=innerHeight}size();addEventListener('resize',size);
+function burst(){
+  const cols=['#ff4d6d','#ffb703','#4cc9f0','#7ae582','#b388ff','#ff8fab'];
+  for(let k=0;k<70;k++)parts.push({t:'c',x:Math.random()*cv.width,y:-10,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,s:6+Math.random()*6,c:cols[k%6],r:Math.random()*6});
+  for(let k=0;k<14;k++)parts.push({t:'b',x:Math.random()*cv.width,y:cv.height+30,vx:(Math.random()-.5)*1.2,vy:-(1.5+Math.random()*2.5),s:18+Math.random()*14,c:cols[k%6],ph:Math.random()*6});
+  if(!raf)loop();
+}
+function loop(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  parts=parts.filter(p=>p.y>-80&&p.y<cv.height+40);
+  parts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.t==='c'){p.r+=.2;cx.fillStyle=p.c;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore();}
+    else{p.ph+=.05;p.x+=Math.sin(p.ph)*.8;cx.fillStyle=p.c;cx.beginPath();cx.ellipse(p.x,p.y,p.s*.8,p.s,0,0,7);cx.fill();cx.strokeStyle='#8888';cx.beginPath();cx.moveTo(p.x,p.y+p.s);cx.lineTo(p.x+Math.sin(p.ph)*6,p.y+p.s*2.2);cx.stroke();}
+  });
+  if(parts.length)raf=requestAnimationFrame(loop);else{raf=0;cx.clearRect(0,0,cv.width,cv.height);}
+}
+
+/* ---------- Game ---------- */
+function show(id){['start','game','end'].forEach(x=>$(x).classList.toggle('hide',x!==id))}
+function render(){
+  const q=Q[i];done=false;
+  $('cnt').textContent=`السؤال ${i+1} / ${Q.length}`;
+  $('sc').textContent=`النقاط: ${score}`;
+  $('pb').style.width=(i/Q.length*100)+'%';
+  $('qn').textContent=i+1;
+  $('qt').innerHTML=q.t.replace('___','<span class="blank">&nbsp;&nbsp;?&nbsp;&nbsp;</span>');
+  $('fb').className='fb';$('fb').innerHTML='';
+  $('next').classList.add('hide');
+  $('opts').innerHTML='';
+  q.o.forEach((t,k)=>{
+    const b=document.createElement('button');
+    b.className='opt';b.textContent=`${'abc'[k]}) ${t}`;
+    b.onclick=()=>pick(k);$('opts').appendChild(b);
+  });
+}
+function pick(k){
+  if(done)return;done=true;
+  const q=Q[i],btns=[...document.querySelectorAll('.opt')],fb=$('fb');
+  btns.forEach(b=>b.disabled=true);
+  $('qt').innerHTML=q.t.replace('___',`<span class="blank">${q.o[q.a]}</span>`);
+  btns[q.a].classList.add('ok');
+  if(k===q.a){
+    score++;$('sc').textContent=`النقاط: ${score}`;
+    fb.className='fb ok';
+    fb.innerHTML=`<b class="t">🎉 أحسنت! Well done!</b><p>✅ السبب: ${q.why}</p>`;
+    ding();burst();
+  }else{
+    btns[k].classList.add('no');
+    fb.className='fb no';
+    fb.innerHTML=`<b class="t">❌ إجابة خاطئة</b><p>سبب الخطأ: <span dir="ltr">"${q.o[k]}"</span> — ${q.bad[k]}</p><p>✅ التصحيح: <span dir="ltr"><b>${q.o[q.a]}</b></span> — ${q.why}</p>`;
+    alarm();
+  }
+  fb.innerHTML+=`<p dir="ltr" style="text-align:left">🔊 ${q.full}</p>`;
+  $('next').textContent=i===Q.length-1?'عرض النتيجة 🏆':'التالي ➜';
+  $('next').classList.remove('hide');
+  setTimeout(()=>say(q.full),k===q.a?500:1900);
+}
+function finish(){
+  $('pb').style.width='100%';show('end');
+  const p=score/Q.length;
+  const st=p>=.9?5:p>=.8?4:p>=.6?3:p>=.4?2:1;
+  $('stars').textContent='⭐'.repeat(st)+'☆'.repeat(5-st);
+  $('final').textContent=`${score} / ${Q.length}`;
+  $('ename').textContent=pname?`النتيجة النهائية للطالب: ${pname}`:'النتيجة النهائية';
+  $('msg').textContent=p>=.9?'ممتاز! Excellent! 🏆':p>=.8?'رائع جدًا! Very good! 👏':p>=.6?'جيد! Good job! 👍':p>=.4?'مقبول، راجع الدرس وحاول مرة أخرى 📖':'حاول مرة أخرى، أنت تستطيع! 💪';
+  if(p>=.6){burst();ding();}
+}
+$('go').onclick=()=>{ctx();pname=$('sname').value.trim();i=0;score=0;show('game');render();setTimeout(()=>say(Q[0].t.replace('___','blank')),300);};
+$('next').onclick=()=>{i++;if(i>=Q.length)finish();else{render();}};
+$('again').onclick=()=>{i=0;score=0;show('game');render();};
+$('spk').onclick=()=>{const q=Q[i];say(done?q.full:q.t.replace('___','blank'));};
+</script>
+</body>
+</html>
