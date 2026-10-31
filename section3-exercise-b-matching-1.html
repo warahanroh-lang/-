@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Section 3 – Exercise B</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&family=Fraunces:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f0fb;--card:#fffefc;--ink:#2a2140;--mut:#756c8a;--line:#d9d1ee;--chip:#4a3a86;--chipt:#fff;--ok:#1e9e5a;--okbg:#e3f7ea;--bad:#d62f3a;--badbg:#fde6e7;--gold:#f0a81c}
+@media (prefers-color-scheme:dark){:root{--bg:#161225;--card:#221b38;--ink:#f1ebff;--mut:#a99dc2;--line:#3b3157;--chip:#f0c46a;--chipt:#2a2140;--okbg:#14382a;--badbg:#401a1f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Cairo',system-ui,sans-serif;min-height:100vh;touch-action:manipulation;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+.wrap{max-width:680px;margin:0 auto;padding:16px 12px 40px}
+header{text-align:center;margin-bottom:12px}
+.tag{display:inline-block;background:var(--gold);color:#2a2140;font-weight:900;padding:3px 14px;border-radius:99px;font-size:14px;direction:ltr}
+h1{font-family:'Fraunces',serif;font-weight:800;font-size:25px;margin:8px 0 2px;direction:ltr}
+.sub{color:var(--mut);font-size:14px}
+.prog{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin:12px 0 4px}
+.prog i{display:block;height:100%;width:0;background:var(--ok);transition:width .5s}
+.meta{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);font-weight:700;margin-bottom:10px}
+.board{position:relative;direction:ltr;display:grid;grid-template-columns:36% 1fr;gap:18% 0;column-gap:14%;row-gap:10px;grid-template-columns:34% 52%;justify-content:space-between}
+.col{display:flex;flex-direction:column;gap:12px}
+svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.node{position:relative;border:2.5px solid var(--line);background:var(--card);border-radius:14px;padding:10px 10px;min-height:76px;display:flex;flex-direction:column;justify-content:center;transition:.2s;user-select:none;-webkit-user-select:none}
+.node.ch{background:var(--chip);color:var(--chipt);border-color:var(--chip);font-family:'Fraunces',serif;font-weight:700;font-size:17px;text-align:center;cursor:grab;touch-action:none}
+.node.ch.sel{outline:4px solid var(--gold);transform:translateX(4px)}
+.node.ds{font-weight:700;font-size:15px;line-height:1.35}
+.node.ds small{display:none;direction:rtl;color:var(--mut);font-size:13px;margin-top:3px;text-align:right;font-family:'Cairo'}
+.node.ds.ok small,.node.ds.fix small{display:block}
+.node.hot{border-color:var(--gold);background:rgba(240,168,28,.2)}
+.node.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.node.ok small{color:#e6ffee}
+.node.bad{background:var(--bad);border-color:var(--bad);color:#fff;animation:shake .5s}
+.node.fix{border-color:var(--ok);box-shadow:0 0 0 3px var(--ok)}
+.node.locked{pointer-events:none}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.ghost{position:fixed;z-index:99;pointer-events:none;transform:translate(-50%,-60%) rotate(-4deg);box-shadow:0 10px 24px rgba(0,0,0,.35);width:140px}
+.fb{display:none;margin-top:18px;text-align:center;border:2px solid var(--line);border-radius:18px;padding:16px 12px;background:var(--card)}
+.fb.show{display:block;animation:pop .4s}
+.fb.ok{background:var(--okbg);border-color:var(--ok)}
+.fb.bad{background:var(--badbg);border-color:var(--bad)}
+@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.face{font-size:62px;line-height:1}
+.verdict{font-size:29px;font-weight:900}
+.ok .verdict{color:var(--ok)}.bad .verdict{color:var(--bad)}
+.why{margin-top:8px;font-weight:700;font-size:16px;line-height:1.7;text-align:right}
+.why b{color:var(--bad)}
+.full{margin-top:10px;text-align:left;direction:ltr;background:rgba(127,127,127,.12);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center}
+.full>div{flex:1}
+.full b{font-family:'Fraunces',serif;font-size:18px;display:block}
+.full span{direction:rtl;display:block;font-size:17px;margin-top:3px;color:var(--mut);text-align:right}
+.spk{width:52px;height:52px;border-radius:50%;border:0;background:var(--chip);color:var(--chipt);font-size:24px;cursor:pointer;flex:none}
+.spk.on{animation:pulse .8s infinite}
+@keyframes pulse{50%{transform:scale(1.15)}}
+.btn{margin-top:14px;font:inherit;font-weight:900;font-size:18px;background:var(--gold);color:#2a2140;border:0;border-radius:14px;padding:12px 30px;cursor:pointer}
+.hint{text-align:center;color:var(--mut);font-size:13px;margin-top:12px}
+.balloon{position:fixed;bottom:-120px;width:46px;height:58px;border-radius:50% 50% 48% 48%;z-index:90;pointer-events:none;animation:rise linear forwards}
+.balloon:after{content:"";position:absolute;left:50%;top:100%;width:2px;height:40px;background:rgba(0,0,0,.35)}
+@keyframes rise{to{transform:translateY(-120vh) translateX(var(--dx))}}
+.flash{position:fixed;inset:0;background:var(--bad);opacity:0;pointer-events:none;z-index:80}
+.flash.go{animation:fl .5s 3}
+@keyframes fl{0%,100%{opacity:0}50%{opacity:.22}}
+.result{text-align:center;background:var(--card);border:2px solid var(--line);border-radius:22px;padding:28px 18px}
+.stars{font-size:42px;letter-spacing:4px;direction:ltr;color:var(--gold)}
+.score{font-family:'Fraunces',serif;font-size:56px;font-weight:800;direction:ltr}
+.msg{font-size:20px;font-weight:700;margin:8px 0}
+.nm{font-weight:900;font-size:22px;direction:ltr;margin-top:8px}
+.hide{display:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="flash" id="flash"></div>
+<div class="wrap">
+<header>
+  <span class="tag">Section 3 · Exercise B</span>
+  <h1>Match the characters</h1>
+  <div class="sub">صِلي كل شخصية بما تفعله أو تقوله: اسحبي الاسم إلى الجملة المناسبة</div>
+</header>
+
+<div id="game">
+  <div class="prog"><i id="bar"></i></div>
+  <div class="meta"><span id="qn">الوصلات: 0 / 4</span><span id="sc">النقاط: 0</span></div>
+  <div class="board" id="board">
+    <svg class="lines" id="lines"></svg>
+    <div class="col" id="cL"></div>
+    <div class="col" id="cR"></div>
+  </div>
+  <div class="fb" id="fb">
+    <div class="face" id="face"></div>
+    <div class="verdict" id="vd"></div>
+    <div class="why hide" id="why"></div>
+    <div class="full">
+      <button class="spk" id="spk" aria-label="Listen">🔊</button>
+      <div><b id="fen"></b><span id="far"></span></div>
+    </div>
+    <button class="btn" id="nxt">التالي</button>
+  </div>
+  <div class="hint" id="hint">اسحبي الاسم بإصبعك إلى الجملة، أو اضغطي الاسم ثم الجملة</div>
+</div>
+
+<div class="result hide" id="res">
+  <div class="stars" id="stars"></div>
+  <div class="score" id="rs"></div>
+  <div class="msg" id="rm"></div>
+  <div class="nm">Dhuha Karim</div>
+  <div class="sub">Section 3 · Exercise B</div>
+  <button class="btn" id="again">إعادة اللعب</button>
+</div>
+</div>
+
+<script>
+/* اسم الشخصية كما في ورقة العمل. لتغيير Mrs إلى Mr عدّلي النص هنا فقط */
+const ITEMS=[
+ {n:"Mr Bingley",d:"defends Elizabeth’s appearance",s:"defends Elizabeth’s appearance",ar:"يدافع عن مظهر إليزابيث",full:"السيد بينغلي يدافع عن مظهر إليزابيث.",why:"لأنه لطيف، فيدافع عن مظهر إليزابيث ولا ينتقدها."},
+ {n:"Mrs Darcy",d:"compliments Elizabeth’s eyes",s:"compliments Elizabeth’s eyes",ar:"يمدح عيون إليزابيث",full:"السيدة دارسي تمدح عيون إليزابيث.",why:"لأنها أُعجبت بجمال عيني إليزابيث، فمدحتهما."},
+ {n:"Mrs (Louisa) Hurst",d:"thinks Jane won’t marry well",s:"thinks Jane won’t marry well",ar:"تعتقد أن جين لن تتزوج بشكل جيد",full:"السيدة (لويزا) هيرست تعتقد أن جين لن تتزوج زواجاً جيداً.",why:"لأنها تنظر بتعالٍ إلى عائلة بينيت، فتظن أن جين لن تتزوج زواجاً جيداً."},
+ {n:"Caroline",d:"comments on Elizabeth’s dirty clothes",s:"comments on Elizabeth’s dirty clothes",ar:"تعلّق على ملابس إليزابيث المتسخة",full:"كارولين تعلّق على ملابس إليزابيث المتسخة.",why:"لأنها تسخر من إليزابيث، فتعلّق على ثيابها المتسخة."}
+];
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let order,state,score,done,locked,sel,AC,cur;
+
+function ctx(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume&&AC.resume()}catch(e){}return AC}
+function tone(f,d,t='sine',s=0,v=.2){const c=ctx();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,c.currentTime+s);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+s+d);o.connect(g);g.connect(c.destination);o.start(c.currentTime+s);o.stop(c.currentTime+s+d)}
+const winSnd=()=>[523,659,784,1047].forEach((f,k)=>tone(f,.25,'triangle',k*.11));
+function alarm(){for(let r=0;r<3;r++)for(let k=0;k<3;k++){tone(880,.13,'square',r*.75+k*.22,.14);tone(440,.13,'square',r*.75+k*.22+.11,.14)}
+ const f=$('flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go')}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.8;
+ const vs=speechSynthesis.getVoices();const v=vs.find(x=>/en[-_]GB/i.test(x.lang)&&/(serena|kate|female|hazel|libby|sonia)/i.test(x.name))||vs.find(x=>/en[-_]GB/i.test(x.lang));if(v)u.voice=v;
+ const b=$('spk');b.classList.add('on');u.onend=u.onerror=()=>b.classList.remove('on');speechSynthesis.speak(u)}catch(e){}}
+if('speechSynthesis' in window)speechSynthesis.getVoices();
+function balloons(){const cols=['#ff4d6d','#ffb703','#4cc9f0','#7bd88f','#b388ff','#ff8fab'];
+ for(let k=0;k<18;k++){const b=document.createElement('div');b.className='balloon';b.style.background=cols[k%6];b.style.left=(Math.random()*92)+'vw';b.style.setProperty('--dx',(Math.random()*80-40)+'px');b.style.animationDuration=(2.8+Math.random()*2)+'s';b.style.animationDelay=(Math.random()*.6)+'s';document.body.appendChild(b);setTimeout(()=>b.remove(),6000)}}
+
+function init(){
+ order=shuffle([0,1,2,3]);state=ITEMS.map(()=>({st:null,pick:null}));score=0;done=0;locked=false;sel=null;
+ $('cL').innerHTML='';$('cR').innerHTML='';
+ ITEMS.forEach((it,i)=>{const c=document.createElement('div');c.className='node ch';c.textContent=it.n;c.id='c'+i;c.onpointerdown=e=>start(e,i);$('cL').appendChild(c)});
+ order.forEach(i=>{const d=document.createElement('div');d.className='node ds';d.id='d'+i;d.innerHTML=ITEMS[i].s+'<small>'+ITEMS[i].ar+'</small>';d.onclick=()=>{if(sel!==null&&!locked)answer(sel,i)};$('cR').appendChild(d)});
+ $('fb').className='fb';$('lines').innerHTML='';update();
+}
+function update(){$('qn').textContent='الوصلات: '+done+' / 4';$('sc').textContent='النقاط: '+score;$('bar').style.width=(done/4*100)+'%'}
+
+function line(ci,di,color,dash){
+ const b=$('board').getBoundingClientRect(),a=$('c'+ci).getBoundingClientRect(),d=$('d'+di).getBoundingClientRect();
+ const x1=a.right-b.left,y1=a.top+a.height/2-b.top,x2=d.left-b.left,y2=d.top+d.height/2-b.top;
+ const l=document.createElementNS('http://www.w3.org/2000/svg','path');
+ const mx=(x1+x2)/2;l.setAttribute('d',`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+ l.setAttribute('fill','none');l.setAttribute('stroke',color);l.setAttribute('stroke-width','5');l.setAttribute('stroke-linecap','round');
+ if(dash)l.setAttribute('stroke-dasharray','2 9');l.dataset.c=ci;l.dataset.d=di;l.dataset.col=color;l.dataset.dash=dash?1:'';
+ $('lines').appendChild(l)}
+function redraw(){const ls=[...$('lines').children].map(p=>[+p.dataset.c,+p.dataset.d,p.dataset.col,p.dataset.dash]);$('lines').innerHTML='';ls.forEach(a=>line(...a))}
+window.addEventListener('resize',redraw);
+
+function answer(ci,di){
+ if(locked||state[ci].st)return;locked=true;sel=null;ctx();
+ document.querySelectorAll('.node.ch').forEach(x=>x.classList.remove('sel'));
+ const ok=ci===di,it=ITEMS[ci],fb=$('fb');
+ const C=$('c'+ci);
+ if(ok){state[ci]={st:'ok',pick:di};C.className='node ch ok locked';const D=$('d'+di);D.className='node ds ok locked';line(ci,di,'#1e9e5a');score++}
+ else{state[ci]={st:'bad',pick:di};C.className='node ch bad locked';$('d'+di).classList.add('bad');
+  const D=$('d'+ci);D.className='node ds fix locked';
+  line(ci,di,'#d62f3a',true);line(ci,ci,'#1e9e5a');
+  setTimeout(()=>$('d'+di).classList.remove('bad'),900)}
+ done++;update();
+ fb.className='fb show '+(ok?'ok':'bad');
+ $('face').textContent=ok?'😄':'😠';
+ $('vd').textContent=ok?'أحسنت! Well done!':'إجابة خاطئة ✗';
+ const w=$('why');
+ if(ok){w.classList.add('hide')}
+ else{const owner=ITEMS[di].n;w.classList.remove('hide');
+  w.innerHTML='<b>سبب الخطأ:</b> الجملة «'+ITEMS[di].ar+'» تخص <b>'+owner+'</b> وليست '+it.n+'.<br><b>التصحيح:</b> '+it.n+' ← '+it.ar+'، '+it.why}
+ $('fen').textContent=it.n+' '+it.d+'.';$('far').textContent=it.full;
+ $('nxt').textContent=done===4?'عرض النتيجة':'التالي';
+ if(ok){winSnd();balloons();setTimeout(()=>say(it.n+' '+it.d),700)}
+ else{alarm();setTimeout(()=>say(it.n+' '+it.d),2500)}
+ setTimeout(()=>fb.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+$('spk').onclick=()=>{const it=ITEMS[lastIdx()];say(it.n+' '+it.d)};
+function lastIdx(){return cur}
+const _ans=answer;answer=function(ci,di){cur=ci;_ans(ci,di)};
+$('nxt').onclick=()=>{try{speechSynthesis.cancel()}catch(e){}$('fb').className='fb';locked=false;done===4?finish():0;if(done<4)window.scrollTo({top:0,behavior:'smooth'})};
+
+function finish(){
+ $('game').classList.add('hide');$('res').classList.remove('hide');
+ const p=score/4,st=Math.round(p*5);
+ $('stars').textContent='★'.repeat(st)+'☆'.repeat(5-st);
+ $('rs').textContent=score+' / 4';
+ $('rm').textContent=p===1?'ممتاز! أداء رائع 🏆':p>=.75?'جيد جداً! 🌟':p>=.5?'جيد، استمري 👍':'حاولي مرة أخرى، ستتحسنين 💪';
+ if(p>=.5){winSnd();balloons()}
+}
+$('again').onclick=()=>{$('res').classList.add('hide');$('game').classList.remove('hide');init()};
+
+/* drag (touch + mouse) or tap-tap */
+function start(e,ci){
+ if(locked||state[ci].st)return;ctx();const c=$('c'+ci),sx=e.clientX,sy=e.clientY;let moved=false,ghost=null,hot=null;
+ const under=(x,y)=>{const el=document.elementFromPoint(x,y);return el&&el.closest('.node.ds:not(.locked)')};
+ const mv=ev=>{if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<8)return;
+  if(!moved){moved=true;ghost=c.cloneNode(true);ghost.classList.add('ghost');ghost.id='';document.body.appendChild(ghost)}
+  ghost.style.left=ev.clientX+'px';ghost.style.top=ev.clientY+'px';
+  const t=under(ev.clientX,ev.clientY);if(hot&&hot!==t)hot.classList.remove('hot');if(t)t.classList.add('hot');hot=t};
+ const up=ev=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);
+  if(hot)hot.classList.remove('hot');if(ghost)ghost.remove();
+  if(moved){const t=under(ev.clientX,ev.clientY);if(t)answer(ci,+t.id.slice(1))}
+  else{document.querySelectorAll('.node.ch').forEach(x=>x.classList.remove('sel'));if(sel===ci)sel=null;else{sel=ci;c.classList.add('sel')}}};
+ addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up);
+}
+init();
+</script>
+</body>
+</html>
