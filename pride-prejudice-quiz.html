@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Section 2 – Exercise d</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&family=Fraunces:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf3e4;--card:#fffdf8;--ink:#2b2233;--mut:#7a6f82;--line:#e6d8bd;--chip:#3b2f63;--chipt:#fff;--ok:#1e9e5a;--okbg:#e3f7ea;--bad:#d62f3a;--badbg:#fde6e7;--gold:#e8a21a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1626;--card:#241e34;--ink:#f3ecff;--mut:#a79bbb;--line:#3a3150;--chip:#f0c46a;--chipt:#2b2233;--okbg:#14382a;--badbg:#401a1f}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Cairo',system-ui,sans-serif;min-height:100vh;touch-action:manipulation}
+.wrap{max-width:640px;margin:0 auto;padding:16px 14px 40px}
+header{text-align:center;margin-bottom:14px}
+.tag{display:inline-block;background:var(--gold);color:#2b2233;font-weight:900;padding:3px 14px;border-radius:99px;font-size:14px;direction:ltr}
+h1{font-family:'Fraunces',serif;font-weight:800;font-size:26px;margin:8px 0 2px;direction:ltr}
+.sub{color:var(--mut);font-size:14px}
+.prog{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin:12px 0 4px}
+.prog i{display:block;height:100%;width:0;background:var(--ok);transition:width .5s}
+.meta{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);font-weight:700}
+.bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0;padding:12px;border:2px dashed var(--line);border-radius:16px;direction:ltr}
+.chip{background:var(--chip);color:var(--chipt);font-weight:700;padding:10px 16px;border-radius:12px;font-size:17px;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;font-family:'Fraunces',serif;transition:transform .15s}
+.chip.sel{outline:3px solid var(--gold);transform:translateY(-3px)}
+.chip.off{opacity:.35;pointer-events:none}
+.ghost{position:fixed;z-index:99;pointer-events:none;transform:translate(-50%,-60%) rotate(-4deg);box-shadow:0 10px 24px rgba(0,0,0,.3)}
+.q{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px 16px;transition:background .3s,border-color .3s}
+.q.ok{background:var(--okbg);border-color:var(--ok)}
+.q.bad{background:var(--badbg);border-color:var(--bad);animation:shake .5s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.sent{direction:ltr;text-align:left;display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:20px;font-weight:700;line-height:1.9;font-family:'Fraunces',serif}
+.slot{min-width:130px;height:44px;border:3px dashed var(--mut);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;font-size:17px;color:var(--mut);transition:.2s}
+.slot.hot{border-color:var(--gold);background:rgba(232,162,26,.18)}
+.slot.ok{border:3px solid var(--ok);background:var(--ok);color:#fff}
+.slot.bad{border:3px solid var(--bad);background:var(--bad);color:#fff;text-decoration:line-through}
+.ar{margin-top:6px;font-size:18px;color:var(--mut);font-weight:700}
+.fb{display:none;margin-top:14px;text-align:center}
+.fb.show{display:block;animation:pop .4s}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.verdict{font-size:30px;font-weight:900}
+.ok .verdict{color:var(--ok)}.bad .verdict{color:var(--bad)}
+.face{font-size:64px;line-height:1}
+.full{margin-top:10px;text-align:left;direction:ltr;background:rgba(127,127,127,.1);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center}
+.full b{font-family:'Fraunces',serif;font-size:18px;display:block}
+.full span{direction:rtl;display:block;font-size:17px;margin-top:2px;color:var(--mut);text-align:right}
+.full>div{flex:1}
+.spk{width:52px;height:52px;border-radius:50%;border:0;background:var(--chip);color:var(--chipt);font-size:24px;cursor:pointer;flex:none}
+.spk.on{animation:pulse .8s infinite}
+@keyframes pulse{50%{transform:scale(1.15)}}
+.nxt{margin-top:14px;font:inherit;font-weight:900;font-size:18px;background:var(--gold);color:#2b2233;border:0;border-radius:14px;padding:12px 30px;cursor:pointer}
+.hint{text-align:center;color:var(--mut);font-size:13px;margin-top:10px}
+.balloon{position:fixed;bottom:-120px;width:46px;height:58px;border-radius:50% 50% 48% 48%;z-index:90;pointer-events:none;animation:rise linear forwards}
+.balloon:after{content:"";position:absolute;left:50%;top:100%;width:2px;height:40px;background:rgba(0,0,0,.35)}
+@keyframes rise{to{transform:translateY(-120vh) translateX(var(--dx))}}
+.result{text-align:center;background:var(--card);border:2px solid var(--line);border-radius:22px;padding:28px 18px}
+.stars{font-size:42px;letter-spacing:4px;direction:ltr}
+.score{font-family:'Fraunces',serif;font-size:56px;font-weight:800;direction:ltr}
+.nm{font-weight:900;font-size:20px;direction:ltr;margin-top:8px}
+.msg{font-size:20px;font-weight:700;margin:8px 0}
+.hide{display:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="tag">Section 2 · Exercise d</span>
+  <h1>Which character…?</h1>
+  <div class="sub">اسحب اسم الشخصية إلى الفراغ المناسب للجملة</div>
+</header>
+
+<div id="game">
+  <div class="prog"><i id="bar"></i></div>
+  <div class="meta"><span id="qn">السؤال 1 / 5</span><span id="sc">النقاط: 0</span></div>
+  <div class="bank" id="bank"></div>
+  <div class="q" id="q">
+    <div class="sent"><span class="slot" id="slot">drop here</span><span id="txt"></span></div>
+    <div class="ar" id="ar"></div>
+    <div class="fb" id="fb">
+      <div class="face" id="face"></div>
+      <div class="verdict" id="vd"></div>
+      <div class="full">
+        <button class="spk" id="spk" aria-label="Listen">🔊</button>
+        <div><b id="fen"></b><span id="far"></span></div>
+      </div>
+      <button class="nxt" id="nxt">التالي</button>
+    </div>
+  </div>
+  <div class="hint">يمكنك السحب بالإصبع أو الضغط على الاسم ثم الضغط على الفراغ</div>
+</div>
+
+<div class="result hide" id="res">
+  <div class="stars" id="stars"></div>
+  <div class="score" id="rs"></div>
+  <div class="msg" id="rm"></div>
+  <div class="nm">Dhuha Karim</div>
+  <div class="sub">Section 2 · Exercise d</div>
+  <button class="nxt" id="again">إعادة اللعب</button>
+</div>
+</div>
+
+<script>
+const NAMES=["Elizabeth","Mr Darcy","Mr Bingley","Mrs Bennet","Mr Bennet"];
+const Q=[
+ {t:"danced with Jane twice.",ar:"رقص مع جين مرتين",a:"Mr Bingley"},
+ {t:"did not attend the ball.",ar:"لم يحضر الحفل",a:"Mr Bennet"},
+ {t:"thought the ball was a waste of time.",ar:"اعتقد أن الحفل مضيعة للوقت",a:"Mr Darcy"},
+ {t:"was interested in the women’s dresses.",ar:"كانت مهتمة بفساتين النساء",a:"Mrs Bennet"},
+ {t:"laughed with their friends about Mr Darcy.",ar:"ضحكت مع الأصدقاء على السيد دارسي",a:"Elizabeth"}
+];
+const $=id=>document.getElementById(id);
+let i=0,score=0,locked=false,sel=null,AC;
+function ctx(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume&&AC.resume()}catch(e){}return AC}
+function tone(f,d,t='sine',s=0,v=.2){const c=ctx();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,c.currentTime+s);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+s+d);o.connect(g);g.connect(c.destination);o.start(c.currentTime+s);o.stop(c.currentTime+s+d)}
+function winSnd(){[523,659,784,1047].forEach((f,k)=>tone(f,.25,'triangle',k*.11))}
+function alarm(){for(let k=0;k<4;k++){tone(880,.14,'square',k*.2,.15);tone(440,.14,'square',k*.2+.1,.15)}}
+function say(text){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-GB';u.rate=.8;u.pitch=1;
+ const vs=speechSynthesis.getVoices();const v=vs.find(x=>/en[-_]GB/i.test(x.lang)&&/(serena|kate|female|google uk english female|hazel|libby|sonia)/i.test(x.name))||vs.find(x=>/en[-_]GB/i.test(x.lang));if(v)u.voice=v;
+ const b=$('spk');b.classList.add('on');u.onend=u.onerror=()=>b.classList.remove('on');speechSynthesis.speak(u)}catch(e){}}
+if('speechSynthesis' in window)speechSynthesis.getVoices();
+
+function balloons(){const cols=['#ff4d6d','#ffb703','#4cc9f0','#7bd88f','#b388ff','#ff8fab'];
+ for(let k=0;k<18;k++){const b=document.createElement('div');b.className='balloon';b.style.background=cols[k%6];b.style.left=(Math.random()*92)+'vw';b.style.setProperty('--dx',(Math.random()*80-40)+'px');b.style.animationDuration=(2.8+Math.random()*2)+'s';b.style.animationDelay=(Math.random()*.6)+'s';document.body.appendChild(b);setTimeout(()=>b.remove(),6000)}}
+
+function build(){
+ $('bank').innerHTML='';
+ NAMES.forEach(n=>{const c=document.createElement('div');c.className='chip';c.textContent=n;c.dataset.n=n;c.onpointerdown=e=>start(e,c);$('bank').appendChild(c)});
+}
+function load(){
+ locked=false;sel=null;const q=Q[i];
+ $('q').className='q';$('fb').className='fb';
+ const s=$('slot');s.className='slot';s.textContent='drop here';
+ $('txt').textContent=q.t;$('ar').textContent=q.ar;
+ $('qn').textContent='السؤال '+(i+1)+' / '+Q.length;$('sc').textContent='النقاط: '+score;
+ $('bar').style.width=(i/Q.length*100)+'%';
+ document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel','off'));
+}
+function answer(n){
+ if(locked)return;locked=true;const q=Q[i],ok=n===q.a,s=$('slot'),box=$('q');
+ document.querySelectorAll('.chip').forEach(c=>c.classList.add('off'));
+ s.textContent=n;s.className='slot '+(ok?'ok':'bad');
+ box.classList.add(ok?'ok':'bad');
+ $('face').textContent=ok?'😄':'😠';
+ $('vd').textContent=ok?'أحسنت! Well done!':'إجابة خاطئة ✗';
+ $('fen').textContent=q.a+' '+q.t;$('far').textContent=q.ar;
+ if(!ok){const c=document.createElement('div');c.style.cssText='margin-top:8px;font-weight:900;color:var(--bad);direction:ltr';c.id='fix';c.textContent='✔ Correct answer: '+q.a;$('fb').insertBefore(c,$('fb').querySelector('.full'))}
+ $('fb').classList.add('show');
+ if(ok){score++;winSnd();balloons();$('sc').textContent='النقاط: '+score;setTimeout(()=>say(q.a+' '+q.t),700)}
+ else{alarm();setTimeout(()=>say(q.a+' '+q.t),1300)}
+ $('nxt').textContent=i===Q.length-1?'عرض النتيجة':'التالي';
+}
+$('nxt').onclick=()=>{speechSynthesis&&speechSynthesis.cancel();const f=$('fix');if(f)f.remove();i++;i<Q.length?load():finish()};
+$('spk').onclick=()=>say(Q[i].a+' '+Q[i].t);
+
+function finish(){
+ $('game').classList.add('hide');$('res').classList.remove('hide');
+ const p=score/Q.length;let st=Math.round(p*5);
+ $('stars').textContent='★'.repeat(st)+'☆'.repeat(5-st);$('stars').style.color='var(--gold)';
+ $('rs').textContent=score+' / '+Q.length;
+ $('rm').textContent=p===1?'ممتاز! أداء رائع 🏆':p>=.8?'جيد جداً! 🌟':p>=.6?'جيد، استمري 👍':p>=.4?'مقبول، حاولي مرة أخرى 💪':'تحتاجين إلى مراجعة، لا تستسلمي 📚';
+ if(p>=.6){winSnd();balloons()}
+}
+$('again').onclick=()=>{i=0;score=0;$('res').classList.add('hide');$('game').classList.remove('hide');load()};
+
+/* drag with pointer events (works on touch + mouse) */
+let ghost=null,moved=false,drag=null;
+function over(x,y){const r=$('slot').getBoundingClientRect(),p=24;return x>r.left-p&&x<r.right+p&&y>r.top-p&&y<r.bottom+p}
+function start(e,c){
+ if(locked)return;ctx();drag=c;moved=false;const sx=e.clientX,sy=e.clientY;
+ const mv=ev=>{if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<8)return;
+  if(!moved){moved=true;ghost=c.cloneNode(true);ghost.classList.add('ghost');document.body.appendChild(ghost)}
+  ghost.style.left=ev.clientX+'px';ghost.style.top=ev.clientY+'px';
+  $('slot').classList.toggle('hot',over(ev.clientX,ev.clientY))};
+ const up=ev=>{window.removeEventListener('pointermove',mv);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);
+  $('slot').classList.remove('hot');
+  if(ghost){ghost.remove();ghost=null}
+  if(moved){if(over(ev.clientX,ev.clientY))answer(c.dataset.n)}
+  else{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));if(sel===c.dataset.n){sel=null}else{sel=c.dataset.n;c.classList.add('sel')}}};
+ window.addEventListener('pointermove',mv);window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+}
+$('slot').onclick=()=>{if(sel&&!locked)answer(sel)};
+build();load();
+</script>
+</body>
+</html>
